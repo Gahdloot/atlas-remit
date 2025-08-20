@@ -33,11 +33,15 @@ class SchoolPaymentRequest(models.Model):
     # university detail
     university = models.CharField(max_length=100)
 
-    payment_status = models.CharField(max_length=10, choices=(
+    payment_status = models.CharField(
+        max_length=10, 
+        default='penidng',
+        choices=(
         ('pending','pending'),
         ('paid','paid'),
         ('failed','failed'),
-    ))
+    ),
+    )
 
     payment_receipt = models.TextField(null=True)
 
