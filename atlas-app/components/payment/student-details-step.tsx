@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { PaymentData } from "@/app/payment/page"
-import { StepIndicator } from "./step-indicator"
+import { FileUp } from "lucide-react"
+import { InputWithLabel } from "../ui/input-with-label"
 
 interface StudentDetailsStepProps {
   paymentData: PaymentData
@@ -27,105 +27,104 @@ export function StudentDetailsStep({
   }
 
   return (
-    <div className="grid lg:grid-cols-2 gap-8 min-h-[70vh]">
-      {/* Left side - Dark background with text */}
-      <div className="bg-background flex flex-col justify-center space-y-6 p-8">
-        <h1 className="text-4xl font-serif font-bold text-foreground leading-tight">
-          A few clicks away from completing your payment.
-        </h1>
-        <p className="text-muted-foreground">Send faster, smarter and safer. Oneremit has got you covered!</p>
-      </div>
+    <div className="in-h-[70vh]">
 
-      {/* Right side - Form */}
-      <div className="flex items-center justify-center">
-        <Card className="w-full max-w-md bg-card border-border">
-          <CardHeader className="pb-4">
-            <StepIndicator currentStep={currentStep} totalSteps={4} />
 
-            <div className="space-y-2 mt-6">
-              <h2 className="text-xl font-semibold text-foreground">
-                Student's <span className="text-accent">details</span>
-              </h2>
-              <p className="text-sm text-muted-foreground">Enter student's details and ID details</p>
+      <div className="space-y-3">
+        <div className="space-y-3">
+          <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
+            Student's <span className="leading-tight bg-gradient-to-tl from-lime-500 via-lime-600 to-green-700 bg-clip-text text-transparent">details</span>
+          </h1>
+          <div className="space-y-1 text-sm text-gray-600">
+            <p className="text-sm text-gray-600">Enter student's details and ID details</p>
+          </div>
+        </div>
+
+        <div className="space-y-6 mt-4 md:mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <InputWithLabel
+              label="Last Name"
+              placeholder=""
+              value={paymentData.studentFirstName}
+              inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
+              onChange={(e) => updatePaymentData({ studentFirstName: e.target.value })}
+            />
+            <InputWithLabel
+              label="Last Name"
+              placeholder=""
+              value={paymentData.studentLastName}
+              inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
+              onChange={(e) => updatePaymentData({ studentLastName: e.target.value })}
+            />
+          </div>
+        </div>
+
+
+
+          <InputWithLabel
+              label="Student ID"
+              placeholder=""
+              value={paymentData.studentId}
+              inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
+              onChange={(e) => updatePaymentData({ studentId: e.target.value })}
+            />
+
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
+            <div className="space-y-2 w-full">
+              <label className="text-sm font-bold text-[#939b98]">Identity type (for payer)</label>
+              <Select
+                value={paymentData.studentIdentityType}
+                onValueChange={(value) => updatePaymentData({ studentIdentityType: value })}
+              >
+                <SelectTrigger className=" border-gray-200 py-4 lg:py-6 text-sm lg:text-base ">
+                  <SelectValue placeholder="Passport"  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="passport">Passport</SelectItem>
+                  <SelectItem value="drivers-license">Drivers License</SelectItem>
+                  <SelectItem value="national-id">National ID</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">First name</label>
-                <Input
-                  placeholder="Adenike"
-                  value={paymentData.studentFirstName}
-                  onChange={(e) => updatePaymentData({ studentFirstName: e.target.value })}
-                  className="bg-input border-border"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">Last name</label>
-                <Input
-                  placeholder="Adebisi"
-                  value={paymentData.studentLastName}
-                  onChange={(e) => updatePaymentData({ studentLastName: e.target.value })}
-                  className="bg-input border-border"
-                />
-              </div>
-            </div>
-
             <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">Student ID</label>
+              <label className="text-sm font-bold text-[#939b98]">Expiry date</label>
               <Input
-                placeholder="BOG-14-11363"
-                value={paymentData.studentId}
-                onChange={(e) => updatePaymentData({ studentId: e.target.value })}
-                className="bg-input border-border"
+                placeholder="12-10-28"
+                value={paymentData.studentExpiryDate}
+                onChange={(e) => updatePaymentData({ studentExpiryDate: e.target.value })}
+                className="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base"
               />
             </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">Identity type</label>
-                <Select
-                  value={paymentData.studentIdentityType}
-                  onValueChange={(value) => updatePaymentData({ studentIdentityType: value })}
-                >
-                  <SelectTrigger className="bg-input border-border">
-                    <SelectValue placeholder="Passport" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="passport">Passport</SelectItem>
-                    <SelectItem value="drivers-license">Drivers License</SelectItem>
-                    <SelectItem value="national-id">National ID</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">Expiry date</label>
-                <Input
-                  placeholder="12-10-28"
-                  value={paymentData.studentExpiryDate}
-                  onChange={(e) => updatePaymentData({ studentExpiryDate: e.target.value })}
-                  className="bg-input border-border"
-                />
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-[#939b98]">Upload identity document (for payer)</label>
+            <div className="border-2 border-dashed border-gray-300 bg-white rounded-lg p-6 text-center">
+              <div className="text-blue-400 text-sm lg:text-base flex items-center justify-center space-x-2">
+                {/* <Upload className="w-5 h-5" /> */}
+                <FileUp className="w-5 h-5" />
+                <span>Upload document</span>
               </div>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">Upload identity document (for payer)</label>
-              <div className="border-2 border-dashed border-accent bg-accent/10 rounded-lg p-4 text-center">
-                <div className="text-accent text-sm">📄 drivers license.jpg</div>
-              </div>
-            </div>
+          
 
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={prevStep} className="flex-1 bg-transparent">
+
+            <div className="grid grid-cols-2 gap-4 md:gap-12 pt-4 justify-between w-full">
+              <Button onClick={prevStep} variant="ghost" className="flex-1 w-full py-6 md:flex-none bg-white text-base font-bold text-gray-600 hover:text-gray-900 cursor-pointer">
                 Go back
               </Button>
-              <Button onClick={handleNext} className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90">
+              <Button
+                onClick={handleNext}
+                className="flex-1 md:flex-none px-8 w-full py-6 cursor-pointer text-base font-bold bg-lime-500 hover:bg-lime-600 text-gray-700"
+              >
                 Next
               </Button>
             </div>
-          </CardContent>
-        </Card>
+        
+
       </div>
     </div>
   )

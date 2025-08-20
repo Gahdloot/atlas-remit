@@ -1,7 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { Church, TrendingUp } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Image from "next/image"
+import { Church } from "lucide-react"
 
 export default function ExchangeRatesSection() {
   return (
@@ -32,7 +30,7 @@ export default function ExchangeRatesSection() {
 
       {/* Exchange Rate Cards - positioned at bottom center */}
       <div className="absolute w-full bottom-6 left-1/2 transform -translate-x-1/2 gap-4 grid grid-cols-2 px-6 z-10">
-        <Card className="bg-white/95 backdrop-blur-md border-0 shadow-2xl rounded-2xl">
+        <Card className="bg-white/95 backdrop-blur-md border-0 shadow-2xl rounded-2xl py-3">
           <CardContent className="">
             <div className="flex items-center gap-2 mb-2">
               <div className="flex -space-x-2">
@@ -52,7 +50,7 @@ export default function ExchangeRatesSection() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/95 backdrop-blur-md border-0 shadow-2xl rounded-2xl">
+        <Card className="bg-white/95 backdrop-blur-md border-0 shadow-2xl rounded-2xl py-3">
           <CardContent className="">
             <div className="flex items-center gap-2 mb-2">
               <div className="flex -space-x-2">

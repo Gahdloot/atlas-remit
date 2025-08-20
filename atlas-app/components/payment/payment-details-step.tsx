@@ -1,9 +1,12 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { FileUp } from "lucide-react"
+import { cn } from "@/lib/utils"
 import type { PaymentData } from "@/app/payment/page"
+import { InputWithLabel } from "../ui/input-with-label"
 
 interface PaymentDetailsStepProps {
   paymentData: PaymentData
@@ -24,125 +27,168 @@ export function PaymentDetailsStep({
     nextStep()
   }
 
+
+  const isFormValid =
+    paymentData.countryFrom?.trim() &&
+    paymentData.countryTo?.trim() &&
+    paymentData.amountNGN?.trim() &&
+    paymentData.amountCAD?.trim() &&
+    paymentData.payerName?.trim() &&
+    paymentData.identityType?.trim() &&
+    paymentData.expirationDate?.trim()
+
   return (
-    <div className="max-w-lg mx-auto space-y-6">
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm">🇳🇬 NON/CAD</span>
-          <span className="text-accent font-semibold text-lg">₦1,510.17</span>
+    <div className="min-h-screen  p-4 ">
+      <div className="">
+        <div className="flex flex-col md:flex-row gap-2 mb-8">
+          <Card className="bg-white/95 backdrop-blur-md border-0  rounded-xl  py-1">
+            <CardContent className="p-4 flex items-center justify-between min-w-[200px]">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex -space-x-2">
+                <div className="w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                  <span className="text-xs text-white font-bold">₦</span>
+                </div>
+                <div className="w-6 h-6 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
+                  <span className="text-xs text-white font-bold">C</span>
+                </div>
+              </div>
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-black">NGN/CAD</div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="font-bold text-lime-600 text-xl">₦1,510.17</div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white/95 backdrop-blur-md border-0 rounded-xl  py-1">
+            <CardContent className="p-4 flex items-center justify-between min-w-[200px]">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex -space-x-2">
+                <div className="w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                  <span className="text-xs text-white font-bold">₦</span>
+                </div>
+                <div className="w-6 h-6 bg-blue-600 rounded-full border-2 border-white flex items-center justify-center">
+                  <span className="text-xs text-white font-bold">£</span>
+                </div>
+              </div>
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-black">
+                    NGN/CAD
+                    </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="font-bold text-lime-600 text-xl">₦1,510.17</div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-        <div className="flex items-center space-x-2">
-          <span className="text-sm">🇬🇧 NGN/GBP</span>
-          <span className="text-accent font-semibold text-lg">₦1,834.82</span>
+
+        <div className="space-y-2 mb-8 w-full">
+          <h2 className="text-2xl lg:text-3xl font-semibold text-gray-900">
+            Payment <span className="leading-tight bg-gradient-to-tl from-lime-500 via-lime-600 to-green-700 bg-clip-text text-transparent">details</span>
+          </h2>
+          <p className="text-gray-500 text-sm lg:text-base">Enter the details required below</p>
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <h2 className="text-3xl font-semibold text-gray-900">
-          Payment <span className="text-accent">details</span>
-        </h2>
-        <p className="text-gray-600">Enter the details required below</p>
-      </div>
-
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Country paying from</label>
-          <Input
+        <div className="space-y-6">
+          <InputWithLabel
+            label="Country paying from"
             placeholder="Enter country"
             value={paymentData.countryFrom}
+            inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
             onChange={(e) => updatePaymentData({ countryFrom: e.target.value })}
-            className="bg-gray-50 border-gray-200"
           />
-        </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Country paying to</label>
-          <Input
-            placeholder="Enter country"
-            value={paymentData.countryTo}
-            onChange={(e) => updatePaymentData({ countryTo: e.target.value })}
-            className="bg-gray-50 border-gray-200"
-          />
-        </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Amount in NGN</label>
-            <Input
-              placeholder=""
+          <InputWithLabel
+              label="Country paying to"
+              placeholder="Enter country"
+              value={paymentData.countryTo}
+              inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
+              onChange={(e) => updatePaymentData({ countryTo: e.target.value })}
+            />
+
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <InputWithLabel
+              label="Amount in NGN"
               value={paymentData.amountNGN}
+              inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
               onChange={(e) => updatePaymentData({ amountNGN: e.target.value })}
-              className="bg-gray-50 border-gray-200"
             />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Amount in CAD</label>
-            <Input
-              placeholder=""
+            <InputWithLabel
+              label="Amount in CAD"
               value={paymentData.amountCAD}
+              inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
               onChange={(e) => updatePaymentData({ amountCAD: e.target.value })}
-              className="bg-gray-50 border-gray-200"
             />
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Name of payer</label>
-          <Input
-            placeholder=""
-            value={paymentData.payerName}
-            onChange={(e) => updatePaymentData({ payerName: e.target.value })}
-            className="bg-gray-50 border-gray-200"
-          />
-        </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Identity type (for payer)</label>
-            <Select
-              value={paymentData.identityType}
-              onValueChange={(value) => updatePaymentData({ identityType: value })}
-            >
-              <SelectTrigger className="bg-gray-50 border-gray-200">
-                <SelectValue placeholder="Select..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="drivers-license">Drivers License</SelectItem>
-                <SelectItem value="passport">Passport</SelectItem>
-                <SelectItem value="national-id">National ID</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Expiration date</label>
-            <Input
-              placeholder=""
-              value={paymentData.expirationDate}
-              onChange={(e) => updatePaymentData({ expirationDate: e.target.value })}
-              className="bg-gray-50 border-gray-200"
+          <InputWithLabel
+              label="Name of payer"
+              value={paymentData.payerName}
+              inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
+              onChange={(e) => updatePaymentData({ payerName: e.target.value })}
             />
-          </div>
-        </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Upload identity document (for payer)</label>
-          <div className="border-2 border-dashed border-blue-300 bg-blue-50 rounded-lg p-6 text-center">
-            <div className="text-blue-600 text-sm flex items-center justify-center space-x-2">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span>Upload document</span>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
+            <div className="space-y-2 w-full">
+              <label className="text-sm font-bold text-[#939b98]">Identity type (for payer)</label>
+              <Select
+                value={paymentData.identityType}
+                onValueChange={(value) => updatePaymentData({ identityType: value })}
+              >
+                <SelectTrigger className=" border-gray-200 py-4 lg:py-6 text-sm lg:text-base  w-full">
+                  <SelectValue placeholder="Select..."  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="drivers-license">Drivers License</SelectItem>
+                  <SelectItem value="passport">Passport</SelectItem>
+                  <SelectItem value="national-id">National ID</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <InputWithLabel
+                label="Expiration date"
+                value={paymentData.expirationDate}
+                inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
+                onChange={(e) => updatePaymentData({ expirationDate: e.target.value })}
+              />
+
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-[#939b98]">Upload identity document (for payer)</label>
+            <div className="border-2 border-dashed border-gray-300 bg-white rounded-lg p-6 text-center">
+              <div className="text-blue-400 text-sm lg:text-base flex items-center justify-center space-x-2">
+                {/* <Upload className="w-5 h-5" /> */}
+                <FileUp className="w-5 h-5" />
+                <span>Upload document</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <Button onClick={handleNext} className="w-full bg-gray-300 text-gray-500 hover:bg-gray-400">
-          Continue
-        </Button>
+          <Button
+            onClick={handleNext}
+            disabled={!isFormValid}
+            className={cn(
+              "w-full py-4 md:py-6 text-base font-bold mt-8 rounded-lg transition-all",
+              isFormValid
+                ? "bg-lime-500 hover:bg-lime-600 text-white"
+                : "bg-gray-300 text-gray-400 cursor-not-allowed"
+            )}
+          >
+            Continue
+          </Button>
+        </div>
       </div>
     </div>
   )
