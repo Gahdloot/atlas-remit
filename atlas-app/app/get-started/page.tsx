@@ -78,7 +78,7 @@ export default function GetStartedPage() {
               <CardHeader className="text-center pb-6 px-4 sm:px-6">
                 <Link href={'/'} className="mb-8 sm:mb-12">
                   <Image 
-                    src={'/images/logo.png'}
+                    src={'/images/logo-new.png'}
                     width={300}
                     height={100}
                     alt="Atlas"

@@ -58,7 +58,7 @@ export default function PaymentPage() {
         <div>
           <Link href="/">
             <Image 
-                src={'/images/logo.png'}
+                src={'/images/logo-new.png'}
                 width={300}
                 height={200}
                 alt="Atlas"

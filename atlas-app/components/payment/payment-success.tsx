@@ -16,7 +16,7 @@ export function PaymentSuccessStep({ email = "someone@example.com", onTrackPayme
       {/* Atlas Logo */}
       <Link href={'/'} className=" mb-8">
         <Image 
-          src={'/images/logo.png'}
+          src={'/images/logo-new.png'}
           width={400}
           height={100}
           alt="Atlas"

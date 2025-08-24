@@ -25,7 +25,7 @@
 //         <CardHeader className="text-center pb-4 font-bold text-4xl">
 //           <div className=" mb-8">
 //             <Image 
-//               src={'/images/logo.png'}
+//               src={'/images/logo-new.png'}
 //               width={400}
 //               height={100}
 //               alt="Atlas"
@@ -93,7 +93,7 @@ export function WelcomeStep({ paymentData, updatePaymentData, nextStep }: Welcom
           {/* Logo */}
           <div className="mb-8 sm:mb-12">
             <Image 
-              src={'/images/logo.png'}
+              src={'/images/logo-new.png'}
               width={300}
               height={100}
               alt="Atlas"
