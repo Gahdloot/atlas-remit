@@ -1,12 +1,15 @@
 "use client"
 
-import type { PaymentData } from "@/app/payment/page"
 import { GraduationCap } from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ChevronDown, Search, X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { StepTitleDescription } from "./step-title-description"
+import { InputWithLabel } from "../ui/input-with-label"
+import { PaymentData } from "@/types/payment"
 
 interface UniversityStepProps {
   paymentData: PaymentData
@@ -59,8 +62,11 @@ export function UniversityStep({
 
   const handleSelect = (university: string) => {
     setSelectedUniversity(university)
+    updatePaymentData({ studentInstitution: university })
     setIsOpen(false)
     setSearchTerm("")
+    
+
   }
 
   const handleClear = () => {
@@ -68,22 +74,33 @@ export function UniversityStep({
     setSearchTerm("")
   }
 
+
+  const isFormValid =
+    paymentData.studentEmail?.trim() &&
+    paymentData.studentFirstName?.trim() &&
+    paymentData.studentLastName?.trim() &&
+    paymentData.studentPersonalEmail?.trim() &&
+    paymentData.studentProgramStudied?.trim() &&
+    paymentData.studentExpectedYearOfCompletion?.trim() &&
+    paymentData.studentDateOfBirth?.trim() &&
+    paymentData.studentInstitution?.trim()
+
   return (
     <div className="">
       <div className="space-y-6">
-        {/* Header */}
-        <div className="space-y-3">
-          <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
-            Choose your <span className="leading-tight bg-gradient-to-tl from-lime-500 via-lime-600 to-green-700 bg-clip-text text-transparent">University</span>
-          </h1>
-          <div className="space-y-1 text-sm text-gray-600">
-            <p>Please select your university to continue.</p>
-            <p>ATLAS supports schools in Canada and the UK for now.</p>
-          </div>
-        </div>
+        <StepTitleDescription 
+            titleNormal={"Institution"} 
+            titleGradient={"Information"} 
+            descriptions={
+              [
+                'Please select your university to continue.',
+                "ATLAS supports schools in Canada and the UK for now."
+              ]
+            } 
+          />
 
         {/* University Selection */}
-        <div className="space-y-2 mt-4 md:mt-6">
+        <div className="space-y-2 mt-4 ">
           <label className=" text-gray-600 mb-2 text-base font-bold">Choose University</label>
 
           <div className="relative mt-2">
@@ -193,6 +210,118 @@ export function UniversityStep({
           </div>
         </div>
 
+
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
+            {/* Expected Year of Completion Dropdown */}
+            <div className="space-y-2 w-full">
+              <label className="text-sm font-bold text-[#939b98]">Expected Year of Completion</label>
+              <Select
+                value={paymentData.studentExpectedYearOfCompletion}
+                onValueChange={(value) => updatePaymentData({ studentExpectedYearOfCompletion: value })}
+              >
+                <SelectTrigger className="border-gray-200 py-4 lg:py-6 text-sm lg:text-base w-full">
+                  <SelectValue placeholder="" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 7 }).map((_, i) => {
+                    const year = 2024 + i
+                    return <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Program Studied Dropdown */}
+            <div className="space-y-2 w-full">
+              <label className="text-sm font-bold text-[#939b98]">Program Studied</label>
+              <Select
+                value={paymentData.studentProgramStudied}
+                onValueChange={(value) => updatePaymentData({ studentProgramStudied: value })}
+              >
+                <SelectTrigger className="border-gray-200 py-4 lg:py-6 text-sm lg:text-base w-full">
+                  <SelectValue placeholder="" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Undergraduate">Undergraduate</SelectItem>
+                  <SelectItem value="Graduate">Graduate</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Payment Type Dropdown */}
+          <div className="space-y-2 w-full">
+            <label className="text-sm font-bold text-[#939b98]">Payment Type</label>
+            <Select
+              value={paymentData.paymentType}
+              onValueChange={(value) => updatePaymentData({ paymentType: value })}
+            >
+              <SelectTrigger className="border-gray-200 py-4 lg:py-6 text-sm lg:text-base w-full">
+                <SelectValue placeholder="" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Application Fee">Application Fee</SelectItem>
+                <SelectItem value="Registration Deposit">Registration Deposit</SelectItem>
+                <SelectItem value="Tution Fee">Tution Fee</SelectItem>
+                <SelectItem value="Resident and Meal Plan">Transportation</SelectItem>
+                <SelectItem value="German Balcked Account">German Balcked Account</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+                {/* Add more options as needed */}
+              </SelectContent>
+            </Select>
+          </div>
+            
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
+            <InputWithLabel
+                label="Student's personal email"
+                value={paymentData.studentPersonalEmail}
+                inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
+                onChange={(e) => updatePaymentData({ studentPersonalEmail: e.target.value })}
+              />
+            <InputWithLabel
+                label="Student's mobile number"
+                value={paymentData.studentPhoneNumber}
+                inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
+                onChange={(e) => updatePaymentData({ studentPhoneNumber: e.target.value })}
+              />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
+            <InputWithLabel
+                label="Student's first name"
+                value={paymentData.studentFirstName}
+                inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
+                onChange={(e) => updatePaymentData({ studentFirstName: e.target.value })}
+              />
+            <InputWithLabel
+                label="Student's last name"
+                value={paymentData.studentLastName}
+                inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
+                onChange={(e) => updatePaymentData({ studentLastName: e.target.value })}
+              />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
+            <InputWithLabel
+                label="Student's date of birth"
+                type="date"
+                value={paymentData.studentDateOfBirth}
+                inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
+                onChange={(e) => updatePaymentData({ studentDateOfBirth: e.target.value })}
+              />
+            <InputWithLabel
+                label="Student's email"
+                type="email"
+                value={paymentData.studentEmail}
+                inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
+                onChange={(e) => updatePaymentData({ studentEmail: e.target.value })}
+              />
+          </div>
+
+        </div>
+
         {/* Navigation Buttons */}
         <div className="grid grid-cols-2 gap-4 md:gap-12 pt-4 justify-between w-full">
           <Button onClick={prevStep} variant="ghost" className="flex-1 w-full py-6 md:flex-none bg-white text-base font-bold text-gray-600 hover:text-gray-900 cursor-pointer">
@@ -202,13 +331,13 @@ export function UniversityStep({
             onClick={handleNext}
             className={cn(
               "flex-1 md:flex-none px-8 w-full py-6 cursor-pointer text-base font-bold",
-              selectedUniversity
+              isFormValid
                 ? "bg-lime-500 hover:bg-lime-600 text-white"
-                : "bg-gray-300 text-gray-400 cursor-not-allowed",
+                : "bg-gray-300 text-gray-400 cursor-not-allowed"
             )}
-            disabled={!selectedUniversity}
+            disabled={!isFormValid}
           >
-            {selectedUniversity ? "Next" : "Next"}
+            Next
           </Button>
         </div>
 

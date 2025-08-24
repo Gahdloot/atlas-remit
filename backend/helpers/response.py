@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
-from helper.code import status_code
-from helper.pagination import Paginator
+from helpers.code import status_code
+from helpers.pagination import Paginator 
 
 
 class DataResponse:

@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { BadgeCheck, Check, GraduationCap } from "lucide-react"
+import { GraduationCap } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 
@@ -64,6 +64,7 @@ export function HeroSection() {
             <Button onClick={() => {
               console.log("clcick")
               router.push("/get-started")
+              // router.push("/get-started")
             }} size="lg" className="bg-lime-400 text-black hover:bg-lime-500 font-medium px-8 py-3 text-lg cursor-pointer">
               Get Started
             </Button>

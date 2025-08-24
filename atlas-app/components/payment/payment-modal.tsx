@@ -1,130 +1,236 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog"
-import { X, Upload, FileText } from "lucide-react"
+import { X, Upload, FileText, Copy, Check } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 interface PaymentModalProps {
   isOpen: boolean
   onClose: () => void
-  nextStep: () => void
   amountNGN: string
   amountCAD: string
+  nextStep: () => void
+  virtualAccount : any
 }
 
-export function PaymentModal({ isOpen, onClose, amountNGN, amountCAD, nextStep }: PaymentModalProps) {
+export function PaymentModal({ isOpen, onClose, amountNGN, amountCAD, nextStep, virtualAccount }: PaymentModalProps) {
   const router = useRouter()
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+  const [copiedField, setCopiedField] = useState<string | null>(null)
+  const [isProcessing, setIsProcessing] = useState(false)
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      setUploadedFile(file)
+  const copyToClipboard = async (text: string, field: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedField(field)
+      setTimeout(() => setCopiedField(null), 2000)
+    } catch (err) {
+      console.error("Failed to copy text: ", err)
     }
   }
 
-  const handlePaymentComplete = () => {
-    // Handle payment completion logic
-    console.log("Payment marked as complete")
-    onClose()
-    nextStep()
-    // router.push("/get-started/payment-submitted") 
+  const downloadAsPDF = () => {
+    // Create a simple HTML content for PDF
+    const content = `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h2>Payment Details</h2>
+        <p><strong>Amount:</strong> ${amountNGN} NGN (${amountCAD} CAD)</p>
+        <h3>Bank Details:</h3>
+        <p><strong>Bank name:</strong> ${virtualAccount?.bank_name}</p>
+        <p><strong>Account number:</strong> ${virtualAccount?.account_number}</p>
+        <p><strong>Account name:</strong> ${virtualAccount?.account_number}</p>
+      </div>
+    `
+
+    const blob = new Blob([content], { type: "text/html" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "payment-details.html"
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
+  const simulatePaymentVerification = async (): Promise<boolean> => {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 3000))
+    
+    // Simulate success/failure (90% success rate)
+    return Math.random() > 0.1
+  }
+
+  const handlePaymentComplete = async () => {
+    setIsProcessing(true)
+    
+    try {
+      console.log("Verifying payment...")
+      const isPaymentVerified = await simulatePaymentVerification()
+      
+      if (isPaymentVerified) {
+        console.log("Payment verified successfully!")
+        onClose()
+        nextStep()
+      } else {
+        console.log("Payment verification failed")
+        // You could show an error message here
+        alert("Payment verification failed. Please try again.")
+      }
+    } catch (error) {
+      console.error("Payment verification error:", error)
+      alert("An error occurred while verifying payment. Please try again.")
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const bankDetails = [
+    { label: "Bank name", value: virtualAccount?.bank_name, field: "bankName" },
+    { label: "Account number", value: virtualAccount?.account_number, field: "accountNumber" },
+    { label: "Account name", value: virtualAccount?.account_name, field: "accountName" },
+  ]
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full h-full max-w-none sm:max-w-md sm:h-auto sm:rounded-lg mx-0 sm:mx-auto bg-white shadow-xl">
-        <DialogHeader className="relative">
-          <button onClick={onClose} className="absolute right-0 top-0 p-2 hover:bg-gray-100 rounded-full cursor-pointer">
-            <X className="h-5 w-5 text-gray-500" />
-          </button>
-        </DialogHeader>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="w-full h-full max-w-none sm:max-w-md sm:h-auto sm:rounded-lg mx-0 sm:mx-auto bg-white shadow-xl">
+          <DialogHeader className="relative">
+            <button
+              onClick={onClose}
+              className="absolute right-0 top-0 p-2 hover:bg-gray-100 rounded-full cursor-pointer"
+              disabled={isProcessing}
+            >
+              <X className="h-5 w-5 text-gray-500" />
+            </button>
+          </DialogHeader>
 
-        <div className="px-6 space-y-6">
-          {/* Amount Display */}
-          <div className="text-center space-y-2">
-            <div className="w-16 h-16 bg-lime-100 rounded-full flex items-center justify-center mx-auto">
-              <FileText className="h-8 w-8 text-lime-600" />
-            </div>
-            <div className="space-y-1">
-              <h2 className="text-2xl font-bold text-gray-900">{amountNGN} EUR</h2>
-              <p className="text-lime-600 font-medium">{amountCAD} CAD</p>
-            </div>
-          </div>
-
-
-        <div className=" bg-gray-100 p-4 space-y-4">
-
-             {/* Instructions */}
-          <p className=" text-gray-600 text-sm">Please pay the amount above into the bank details below</p>
-
-          {/* Bank Details */}
-          <div className="space-y-4">
-            <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide">Bank name</p>
-              <p className="font-medium text-gray-900">BANCA DE SABADEL</p>
-            </div>
-
-            <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide">IBAN</p>
-              <p className="font-medium text-gray-900">0123456780138547859</p>
-            </div>
-
-            <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide">SWIFT/BIC</p>
-              <p className="font-medium text-gray-900">GBEU294U4</p>
+          <div className="px-6 space-y-6">
+            {/* Amount Display */}
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 bg-lime-100 rounded-full flex items-center justify-center mx-auto">
+                <FileText className="h-8 w-8 text-lime-600" />
+              </div>
+              <div className="space-y-1">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {new Intl.NumberFormat('en-NG', { 
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2 
+                  }).format(Number(amountNGN))} NGN
+                </h2>
+                <p className="text-lime-600 font-medium">
+                  {new Intl.NumberFormat('en-CA', { 
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2 
+                  }).format(Number(amountCAD))} CAD
+                </p>
+              </div>
             </div>
 
-            <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide">Account name</p>
-              <p className="font-medium text-gray-900">ONEREMIT TECHNOLOGIES</p>
+            <div className="bg-gray-100 p-4 rounded-lg space-y-4">
+              {/* Instructions */}
+              <p className="text-gray-600 text-sm">Please pay the amount above into the bank details below</p>
+
+              {/* Bank Details with Copy Functionality */}
+              <div className="space-y-4">
+                {bankDetails.map((detail) => (
+                  <div key={detail.field} className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <p className="text-xs text-gray-500 uppercase tracking-wide">{detail.label}</p>
+                      <p className="font-medium text-gray-900">{detail.value}</p>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(detail.value, detail.field)}
+                      className="p-2 hover:bg-gray-200 rounded-md transition-colors cursor-pointer"
+                      disabled={isProcessing}
+                    >
+                      {copiedField === detail.field ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <Copy className="h-4 w-4 text-lime-600" />
+                      )}
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Download PDF Button */}
+              <div className="flex justify-start">
+                <Button
+                  onClick={downloadAsPDF}
+                  variant="outline"
+                  className="border-gray-200 text-gray-700 cursor-pointer bg-white"
+                  disabled={isProcessing}
+                >
+                  Download as PDF
+                </Button>
+              </div>
             </div>
-          </div>
 
-          {/* Upload Section */}
-          <div className="space-y-3">
-            <p className="text-xs text-gray-500 uppercase tracking-wide">Upload payment receipt</p>
-
-            <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 bg-white">
-              <input
-                type="file"
-                id="receipt-upload"
-                className="hidden"
-                accept=".pdf,.jpg,.jpeg,.png"
-                onChange={handleFileUpload}
-              />
-              <label
-                htmlFor="receipt-upload"
-                className="flex items-center  justify-center cursor-pointer space-x-2"
+            {/* Action Button with Loading Animation */}
+            <div className="flex justify-center items-center">
+              <Button
+                onClick={handlePaymentComplete}
+                disabled={isProcessing}
+                className={`
+                  w-fit py-3 font-medium rounded-lg transition-all duration-200
+                  ${isProcessing 
+                    ? 'bg-lime-400 cursor-not-allowed' 
+                    : 'bg-lime-500 hover:bg-lime-600 cursor-pointer'
+                  }
+                  min-w-[140px] h-[48px] flex items-center justify-center text-white
+                `}
               >
-                <Upload className="h-4 w-4 text-blue-500" />
-                <span className="text-blue-500 text-sm font-medium">
-                  {uploadedFile ? uploadedFile.name : "Upload document"}
-                </span>
-              </label>
+                {isProcessing ? (
+                  <div className="flex space-x-1">
+                    <div 
+                      className="w-2 h-2 bg-white rounded-full"
+                      style={{
+                        animation: 'dotPulse 1.5s infinite ease-in-out',
+                        animationDelay: '0s'
+                      }}
+                    ></div>
+                    <div 
+                      className="w-2 h-2 bg-white rounded-full"
+                      style={{
+                        animation: 'dotPulse 1.5s infinite ease-in-out',
+                        animationDelay: '0.2s'
+                      }}
+                    ></div>
+                    <div 
+                      className="w-2 h-2 bg-white rounded-full"
+                      style={{
+                        animation: 'dotPulse 1.5s infinite ease-in-out',
+                        animationDelay: '0.4s'
+                      }}
+                    ></div>
+                  </div>
+                ) : (
+                  'I have paid'
+                )}
+              </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
 
-
-        </div>
-         
-          {/* Action Button */}
-          <div className=" flex justify-center items-center">
-
-            <Button
-            onClick={handlePaymentComplete}
-            className=" py-3 bg-lime-500 hover:bg-lime-600 text-white font-medium rounded-lg cursor-pointer "
-          >
-            I have paid
-          </Button>
-          </div>
-          
-        </div>
-      </DialogContent>
-    </Dialog>
+      {/* CSS Styles for Animation */}
+      <style jsx>{`
+        @keyframes dotPulse {
+          0%, 60%, 100% {
+            opacity: 0.3;
+            transform: scale(0.8);
+          }
+          30% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
+    </>
   )
 }

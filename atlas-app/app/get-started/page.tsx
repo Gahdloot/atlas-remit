@@ -1,133 +1,209 @@
 "use client"
 
 import { useState } from "react"
-import { WelcomeStep } from "@/components/payment/welcome-step"
-import { UniversityStep } from "@/components/payment/university-step"
-import { PaymentDetailsStep } from "@/components/payment/payment-details-step"
-import { StudentDetailsStep } from "@/components/payment/student-details-step"
-import { ConfirmPayStep } from "@/components/payment/confirm-pay-step"
-import { StepIndicator } from "@/components/payment/step-indicator"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { useRouter } from "next/navigation"
+import { useSendWelcomeEmailMutation,useResendEmailMutation } from "@/store/api/schoolPaymentSlice"
 import Link from "next/link"
 
 
-export type PaymentData = {
-  email: string
-  university: string
-  countryFrom: string
-  countryTo: string
-  amountNGN: string
-  amountCAD: string
-  payerName: string
-  identityType: string
-  expirationDate: string
-  studentFirstName: string
-  studentLastName: string
-  studentId: string
-  studentIdentityType: string
-  studentExpiryDate: string
-}
+export default function GetStartedPage() {
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [step, setStep] = useState('1')
+  const [sendWelcomeEmail, { isLoading, error }] = useSendWelcomeEmailMutation();
+ const [resendWelcomeEmail, { isLoading: isResendEmailLoading, error: resendErr }] = useResendEmailMutation();
 
-export default function PaymentPage() {
-  const [currentStep, setCurrentStep] = useState(0)
-  const [paymentData, setPaymentData] = useState<PaymentData>({
-    email: "",
-    university: "",
-    countryFrom: "",
-    countryTo: "",
-    amountNGN: "",
-    amountCAD: "",
-    payerName: "",
-    identityType: "",
-    expirationDate: "",
-    studentFirstName: "",
-    studentLastName: "",
-    studentId: "",
-    studentIdentityType: "",
-    studentExpiryDate: "",
-  })
+  const validateEmail = (email: string) => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+};
 
-  const steps = [
-    { component: WelcomeStep, title: "Welcome" },
-    { component: PaymentDetailsStep, title: "Payment details" },
-    { component: UniversityStep, title: "University" },
-    { component: StudentDetailsStep, title: "Student's details" },
-    { component: ConfirmPayStep, title: "Confirm and pay" },
-  ]
-  
 
-  const CurrentStepComponent = steps[currentStep].component
-
-  const nextStep = () => {
-
-    console.log(currentStep)
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1)
+  const handleContinue = async () => {
+    if (!validateEmail(email)) {
+      alert("Please enter a valid email address.");
+      return;
     }
-  }
 
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1)
+    try {
+      await sendWelcomeEmail({ email }).unwrap();
+      setStep('2');
+    } catch (err) {
+      console.error("Failed to send welcome email:", err);
+      alert("Something went wrong. Please try again.");
     }
+  };
+
+
+  const handleResendEmail = async () => {
+  if (!validateEmail(email)) {
+    alert("Invalid email.");
+    return;
   }
 
-  const updatePaymentData = (data: Partial<PaymentData>) => {
-    setPaymentData((prev) => ({ ...prev, ...data }))
+  try {
+    await resendWelcomeEmail({ email }).unwrap();
+    alert("Resend email sent successfully.");
+  } catch (err) {
+    console.error("Failed to resend email:", err);
+    alert("Something went wrong while resending the email.");
   }
+};
 
+
+// EmailSentConfirmation
   return (
     <div className="min-h-screen flex">
-      {/* Left Dark Side - hidden on step 0 */}
-      {currentStep !== 0 && (
-        <div  className="w-1/3 hidden bg-card bg-gradient-to-t from-black via-[#081401] to-[#0c1903] text-white md:flex flex-col justify-between p-12">
-          <div>
-          <Link href="/">
-            <div className="text-accent font-serif font-bold text-2xl mb-16 cursor-pointer">
-              ATLAS
-            </div>
-          </Link>
-          <div className="space-y-6">
-            <h1 className="text-4xl font-bold leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
-              A few clicks away
-              <br />
-              from completing
-              <br />
-              <span className="leading-tight bg-gradient-to-b from-lime-200 via-lime-300 to-green-500 bg-clip-text text-transparent">
-                your payment.
-              </span>
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Send faster, smarter and safer. Oneremit has
-              <br />
-              got you covered
-            </p>
-          </div>
-        </div>
-        </div>
-      )}
 
-      {/* Right White Side - full width if step 0 bg-[#f8f8f8]*/} 
-      <div className={`${currentStep < 1  ? "w-full bg-card bg-gradient-to-t from-black via-[#081401] to-[#0c1903]" : "w-full lg:w-2/3  bg-[#eeebeb] "} flex flex-col`}>
-        {/* Optional: step indicator header */}
-        {currentStep !== 0 && (
-          <div className="p-8 border-b border-gray-100 w-full lg:w-2/3 md:mx-auto">
-            <StepIndicator currentStep={currentStep} totalSteps={steps.length} />
-          </div>
-        )}
-
+      {/* Right Side */}
+      <div
+        className={`w-full flex flex-col`}
+        style={
+          {
+            backgroundImage: "url('/images/background.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }
+        }
+      >
         {/* Step Content */}
         <div className="flex-1 p-8">
-          <div className="w-full lg:w-2/3 lg:mx-auto"> 
-            <CurrentStepComponent
-              paymentData={paymentData}
-              updatePaymentData={updatePaymentData}
-              nextStep={nextStep}
-              prevStep={prevStep}
-              currentStep={currentStep}
-            />
+          <div className="w-full lg:w-2/3 lg:mx-auto">
+          <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
+            <Card className="bg-transparent w-full max-w-sm sm:max-w-md border-0 mx-auto">
+              <CardHeader className="text-center pb-6 px-4 sm:px-6">
+                <Link href={'/'} className="mb-8 sm:mb-12">
+                  <Image 
+                    src={'/images/logo.png'}
+                    width={300}
+                    height={100}
+                    alt="Atlas"
+                    className="mx-auto w-auto h-12 sm:h-16"
+                    priority
+                  />
+                </Link>
+                {step == '1'? (
+                  <>
+                  {/* Welcome Text */}
+                  <div className="space-y-1 mb-6">
+                    <h1 className="text-white text-2xl sm:text-3xl font-normal leading-tight">
+                      Hi there, <span className="text-lime-200">scholar!</span>
+                    </h1>
+                    <h2 className="text-white text-2xl sm:text-3xl font-normal">
+                      Welcome to ATLAS!
+                    </h2>
+                    <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+                      Enter your email to get the secure link and start your tution payment
+                    </p>
+                  </div>
+                  </>
+                ):(
+                  <>
+                  {/* Welcome Text */}
+                  <div className="space-y-1 mb-3">
+                    <h1 className="text-white text-2xl sm:text-3xl font-normal leading-tight">
+                      <span className="text-lime-200">Email sent!</span>
+                    </h1>
+                    <div className="space-y-4 mb-6">
+                      <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+                          An email with your payment information has been sent to{" "}
+                          <span className="text-lime-400">{email}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-4 px-4 sm:px-6 items-center">
+              <p className="text-gray-400 text-sm">
+                  Didn't get an email?{" "}
+                <button
+                  onClick={handleResendEmail}
+                  className="text-white underline hover:text-lime-400 transition-colors disabled:opacity-50"
+                  disabled={isResendEmailLoading}
+                >
+                  {isResendEmailLoading ? "Resending..." : "Resend email"}
+                </button>
+
+              </p>
+
+              <div className="text-gray-500 text-sm">OR</div>
+
+              <Button
+                  onClick={()=> setStep('1')}
+                  className="bg-lime-400 hover:bg-lime-500 text-black 
+                      border-lime-400 hover:border-lime-500 font-semibold 
+                      h-12 px-8 rounded-lg  cursor-pointer"
+              >
+                  Edit email
+              </Button>
+            </div>
+                  </>
+                )}
+              </CardHeader>
+              {step == '1' ? (
+          <CardContent className="space-y-6 px-4 sm:px-6">
+            {/* Email Input */}
+            <div className="space-y-3">
+              <label className="text-gray-400 text-sm font-medium block text-left">
+                Email
+              </label>
+              <Input
+                type="email"
+                placeholder="kunlead03@gmail.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value )}
+                className="
+                  bg-transparent 
+                  border-2 
+                  border-lime-400 
+                  rounded-lg 
+                  text-white 
+                  placeholder:text-gray-500
+                  h-12 
+                  sm:h-14 
+                  px-4
+                  text-base
+                  focus:border-lime-300
+                  focus:ring-lime-400/20
+                  focus:ring-2
+                "
+              />
+            </div>
+
+            {/* Continue Button */}
+            <div className="pt-4">
+                <Button
+                  onClick={handleContinue}
+                  className="
+                    w-full 
+                    bg-lime-400 
+                    hover:bg-lime-500 
+                    text-black 
+                    font-semibold 
+                    h-12 
+                    sm:h-14 
+                    rounded-lg
+                    text-base
+                    transition-colors
+                    duration-200
+                    cursor-pointer
+                  "
+                  disabled={!validateEmail(email) || isLoading}
+                >
+                  {isLoading ? "Sending..." : "Continue"}
+                </Button>
+
+            </div>
+          </CardContent>
+          ): (<></> )}
+            </Card>
 
           </div>
           
+            
+          </div>
         </div>
       </div>
     </div>

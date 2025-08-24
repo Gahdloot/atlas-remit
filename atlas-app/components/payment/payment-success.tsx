@@ -1,63 +1,49 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { Check } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import Image from "next/image"
+import Link from "next/link"
 
-interface PaymentSuccessProps {
+interface PaymentSuccessStepProps {
   email?: string
-  onClose?: () => void
+  onTrackPayment?: () => void
 }
 
-export function PaymentSuccess({ email = "someone@example.com", onClose }: PaymentSuccessProps) {
-    const router = useRouter()
-
-
-    const handleGotItClick = () => {
-    router.push("/")  // Navigate to homepage
-  }
+export function PaymentSuccessStep({ email = "someone@example.com", onTrackPayment }: PaymentSuccessStepProps) {
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center">
-      {/* ATLAS Branding */}
-      <div className="absolute top-8 left-8">
-        <h1 className="text-2xl font-bold text-lime-400">ATLAS</h1>
-      </div>
-      {/* Success Icons */}
-      <div className="flex items-center justify-center mb-8">
-        {/* Desktop: Show both icons */}
-        <div className="hidden md:flex items-center gap-4">
-          {/* Green circle with checkmark */}
-          <div className="w-20 h-20 bg-lime-500 rounded-full flex items-center justify-center relative">
-            <div className="w-16 h-16 bg-lime-600 rounded-full flex items-center justify-center">
-              <Check className="w-8 h-8 text-black" strokeWidth={3} />
-            </div>
-          </div>
-        </div>
-        {/* Mobile: Show only green checkmark */}
-        <div className="md:hidden">
-          <div className="w-20 h-20 bg-lime-500 rounded-full flex items-center justify-center relative">
-            <div className="w-16 h-16 bg-lime-600 rounded-full flex items-center justify-center">
-              <Check className="w-8 h-8 text-black" strokeWidth={3} />
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen fixed top-0  flex flex-col items-center justify-center px-4 text-center">
+      {/* Atlas Logo */}
+      <Link href={'/'} className=" mb-8">
+        <Image 
+          src={'/images/logo.png'}
+          width={400}
+          height={100}
+          alt="Atlas"
+        />
+      </Link>
 
-      {/* Success Message */}
-      <div className="text-center max-w-md mx-auto mb-8">
-        <h2 className="text-white text-2xl font-semibold mb-4">You're all set!</h2>
-        <p className="text-gray-400 text-base leading-relaxed">
-          Your payment has been initiated. Feedback will be sent to you via email{" "}
-          <span className="text-white font-medium">{email}</span>
+      <div className="relative w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg p-1">
+        <p className="bg-lime-400 to-green-600 rounded-full flex items-center justify-center mx-auto shadow-lg p-2">
+        <Check className="w-8 h-8 text-black" />
         </p>
       </div>
 
-      {/* Got it Button */}
+      {/* Success Message */}
+      <div className="mb-12 max-w-md">
+        <h2 className="text-lime-100 text-2xl font-semibold mb-4">Your payment has been initiated!</h2>
+        <p className="text-gray-400 text-base leading-relaxed">
+          We've started processing your payment. You'll receive an update shortly at{" "}
+          <span className="text-lime-500 font-medium">{email}</span>
+        </p>
+      </div>
+
+      {/* Track Payment Button */}
       <Button
-        onClick={handleGotItClick}
-        className="bg-lime-500 hover:bg-lime-600 text-black font-semibold px-8 py-3 rounded-lg text-base"
+        onClick={onTrackPayment}
+        className="bg-lime-500 hover:bg-lime-600 text-black font-semibold px-8 py-3 rounded-lg text-base cursor-pointer"
       >
-        Got it!
+        Track Payment
       </Button>
     </div>
   )
