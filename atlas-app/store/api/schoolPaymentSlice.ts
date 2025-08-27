@@ -158,7 +158,7 @@ export const schoolPaymentSlice = createApi({
     // ============= PAYMENT VERIFICATION ENDPOINTS =============
 
     verifyPayment: builder.mutation<
-      ApiResponse<PaymentVerification>,
+      ApiResponse<any>,
       PaymentVerificationRequest
     >({
       query: (verificationData) => ({
@@ -276,6 +276,39 @@ export const schoolPaymentSlice = createApi({
       }),
     }),
 
+
+  getCurrenciesWithRates: builder.query<
+    ApiResponse<any[]>,
+    { active_only?: boolean; base_currency?: string }
+  >({
+    query: (params = { base_currency: 'NGN' }) => ({
+      url: `currencies/`,
+      method: "GET",
+      params: params,
+    }),
+  }),
+  getExchangeRates: builder.query<
+    ApiResponse<any[]>,
+    { from_currency?: string; to_currency?: string }
+  >({
+    query: (params = {}) => ({
+      url: `exchange-rates/`,
+      method: "GET",
+      params: params,
+    }),
+  }),
+
+
+  refreshExchangeRates: builder.mutation<
+    ApiResponse<{ updated_rates: number; last_updated: string }>,
+    void
+  >({
+    query: () => ({
+      url: `exchange-rates/refresh/`,
+      method: "POST",
+    }),
+  }),
+
     // ============= NOTIFICATION ENDPOINTS =============
 
     getNotifications: builder.query<
@@ -375,4 +408,9 @@ export const {
   // Webhook hooks
   useConfigureWebhookMutation,
   useTestWebhookMutation,
+
+
+  useGetCurrenciesWithRatesQuery,
+  useGetExchangeRatesQuery,
+  useRefreshExchangeRatesMutation,
 } = schoolPaymentSlice;

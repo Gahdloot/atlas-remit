@@ -5,6 +5,7 @@ from django.core.files.base import ContentFile
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
+from account.models.currency import Currency
 from rest_framework import generics, status
 from rest_framework.response import Response
 from datetime import datetime, timedelta
@@ -12,7 +13,7 @@ import secrets
 import string
 
 from account.models.payment_request import SchoolPaymentRequest, SchoolPaymentRequestInitializer
-from account.serializers import PaymentTackingSerializer, SchoolPaymentRequestSerializer
+from account.serializers import CurrencyWithRateSerializer, PaymentTackingSerializer, SchoolPaymentRequestSerializer
 from helpers.response import bad_request_response, success_response
 from helpers.upload_to_s3 import upload_base64_to_s3
 
@@ -51,9 +52,24 @@ class SchoolPaymentRequestCreateView(generics.GenericAPIView):
                 except Exception as e:
                     return bad_request_response(message=f"Failed to upload document")
 
+        
+        payment_initializer = request.data.get('identifier')
+
+        try:
+            payment_initializer_object = SchoolPaymentRequestInitializer.objects.get(id=payment_initializer)
+        except:
+            return bad_request_response(message="Invalid request")
+        
+        if payment_initializer_object.status == 'completed':
+            return bad_request_response(message="Invalid request")
+
+        data['payment_initializer'] = payment_initializer
         serializer = self.get_serializer(data=data)
+        
         serializer.is_valid(raise_exception=True)
         payment_request = serializer.save()
+        payment_initializer_object.status = 'completed'
+        payment_initializer_object.save()
 
         return success_response(
             data={
@@ -85,11 +101,23 @@ class TractPaymentView(generics.GenericAPIView):
     permission_classes = []
 
     def post(self, request):
-        data = request.data.copy() 
-        key_to_upload = ['student_document', 'payer_id_document','payment_receipt']
+        payment_reference = request.data.get('payment_reference')
+        email = request.data.get('email')
+
+        try:
+            payment_request = SchoolPaymentRequest.objects.get(payment_id=payment_reference)
+        except:
+            return bad_request_response(message="Invalid ID provided")
+        
+        print(payment_request.payment_initializer.email)
+        if payment_request.payment_initializer.email != email:
+            return bad_request_response(message="Invalid ID provided")
+
 
         return success_response(
-            data={ }
+            data={ 
+                'status':payment_request.processing_status
+            }
         )
 
 
@@ -145,36 +173,8 @@ class ResendEmailView(generics.GenericAPIView):
             return bad_request_response(message="Email address is required")
 
         try:
-            if email_type == 'welcome':
-                subject = "Welcome to School Payment System - Resent"
-                message = f"""
-                Dear User,
-
-                This is a resent welcome email for our School Payment System!
-
-                You can now access all features of our platform:
-                - Submit payment requests
-                - Track payments
-                - Upload documents
-                - Receive confirmations
-
-                Best regards,
-                School Payment Team
-                """
-            else:
-                subject = "School Payment System Notification"
-                message = f"""
-                Dear User,
-
-                This is a notification from our School Payment System.
-
-                Please log in to your account to check for any updates or required actions.
-
-                Best regards,
-                School Payment Team
-                """
-
-                time.sleep(2)
+            
+            time.sleep(1)
             # from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@schoolpayment.com')
             
             # send_mail(
@@ -260,6 +260,13 @@ class PaymentVerificationView(generics.GenericAPIView):
         
         if not payment_reference and not transaction_id:
             return bad_request_response(message="Payment reference or transaction ID is required")
+        
+        try:
+            payment_request = SchoolPaymentRequest.objects.get(id=payment_reference)
+        except:
+            return bad_request_response(
+                message=""
+            )
 
         try:
             
@@ -270,11 +277,14 @@ class PaymentVerificationView(generics.GenericAPIView):
             
             if verification_result['status'] == 'success':
                 # Update payment status in your database here
+                payment_request.processing_status = 'initiated'
+                payment_request.save()
                 return success_response(
                     message="Payment verified successfully",
                     data={
                         'payment_reference': payment_reference,
                         'transaction_id': transaction_id,
+                        'payment_id': payment_request.payment_id,
                         'amount': verification_result.get('amount'),
                         'status': 'verified',
                         'verified_at': timezone.now(),
@@ -286,6 +296,7 @@ class PaymentVerificationView(generics.GenericAPIView):
                     message="Payment is still pending",
                     data={
                         'payment_reference': payment_reference,
+                        'payment_id': payment_request.payment_id,
                         'status': 'pending',
                         'message': 'Payment is being processed'
                     }
@@ -311,7 +322,8 @@ class PaymentVerificationView(generics.GenericAPIView):
         import random
         
         # Simulate different payment statuses
-        statuses = ['success', 'pending', 'failed']
+        statuses = ['success']
+        # statuses = ['success', 'pending', 'failed']
         status = random.choice(statuses)
         
         if status == 'success':
@@ -329,3 +341,8 @@ class PaymentVerificationView(generics.GenericAPIView):
             }
 
 
+class CurrencyRateListView(generics.GenericAPIView):
+    def get(self, request):
+        queryset = Currency.objects.filter(is_active=True).exclude(code="NGN")
+        serializer = CurrencyWithRateSerializer(queryset, many=True)
+        return success_response(data=serializer.data)

@@ -64,12 +64,55 @@ export function UniversityStep({
     setSearchTerm("")
   }
 
+  const isValidEmail = (email: string): boolean => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    };
+    const formatDateInput = (value: string): string => {
+    // Remove non-digits
+    const digits = value.replace(/\D/g, '').slice(0, 8); // max 8 digits (ddmmyyyy)
+
+    let formatted = '';
+
+    if (digits.length <= 2) {
+      formatted = digits;
+    } else if (digits.length <= 4) {
+      formatted = digits.slice(0, 2) + '-' + digits.slice(2);
+    } else {
+      formatted = digits.slice(0, 2) + '-' + digits.slice(2, 4) + '-' + digits.slice(4);
+    }
+
+    return formatted;
+  };
+
+  const isValidDateOfBirth = (dob: string): boolean => {
+    const [day, month, year] = dob.split('-').map(Number);
+    if (!day || !month || !year) return false;
+
+    const birthDate = new Date(year, month - 1, day);
+    if (isNaN(birthDate.getTime())) return false;
+
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const hasHadBirthdayThisYear =
+      today.getMonth() > birthDate.getMonth() ||
+      (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+
+    const actualAge = hasHadBirthdayThisYear ? age : age - 1;
+
+    return actualAge >= 15;
+  };
+
+
+
 
   const isFormValid =
     paymentData.studentEmail?.trim() &&
+    isValidEmail(paymentData.studentEmail) &&
     paymentData.studentFirstName?.trim() &&
     paymentData.studentLastName?.trim() &&
     paymentData.studentPersonalEmail?.trim() &&
+    isValidEmail(paymentData.studentPersonalEmail) &&
     paymentData.studentProgramStudied?.trim() &&
     paymentData.studentExpectedYearOfCompletion?.trim() &&
     paymentData.studentDateOfBirth?.trim() &&
@@ -266,11 +309,15 @@ export function UniversityStep({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
             <InputWithLabel
-                label="Student's personal email"
-                value={paymentData.studentPersonalEmail}
-                inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
-                onChange={(e) => updatePaymentData({ studentPersonalEmail: e.target.value })}
-              />
+              label="Student's personal email"
+              value={paymentData.studentPersonalEmail}
+              inputClassName={`bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10 ${
+                paymentData.studentPersonalEmail && !isValidEmail(paymentData.studentPersonalEmail) 
+                  ? 'border-red-500 focus:border-red-500' 
+                  : ''
+              }`}
+              onChange={(e) => updatePaymentData({ studentPersonalEmail: e.target.value })}
+            />
             <InputWithLabel
                 label="Student's mobile number"
                 value={paymentData.studentPhoneNumber}
@@ -295,19 +342,34 @@ export function UniversityStep({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
             <InputWithLabel
-                label="Student's date of birth"
-                type="date"
+                label="Student's date of birth (dd-mm-yyyy)"
+                type="text"
+                placeholder=""
                 value={paymentData.studentDateOfBirth}
-                inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
-                onChange={(e) => updatePaymentData({ studentDateOfBirth: e.target.value })}
+                // inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
+                inputClassName={`bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10 ${
+                  paymentData.studentDateOfBirth &&
+                  !isValidDateOfBirth(paymentData.studentDateOfBirth)
+                    ? 'border-red-500 focus:border-red-500'
+                    : ''
+                }`}
+                // onChange={(e) => updatePaymentData({ studentDateOfBirth: e.target.value })}
+                onChange={(e) => {
+                  const formattedDate = formatDateInput(e.target.value);
+                  updatePaymentData({ studentDateOfBirth: formattedDate });
+                }}
               />
             <InputWithLabel
-                label="Student's email"
-                type="email"
-                value={paymentData.studentEmail}
-                inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
-                onChange={(e) => updatePaymentData({ studentEmail: e.target.value })}
-              />
+              label="Student's email"
+              type="email"
+              value={paymentData.studentEmail}
+              inputClassName={`bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10 ${
+                paymentData.studentEmail && !isValidEmail(paymentData.studentEmail) 
+                  ? 'border-red-500 focus:border-red-500' 
+                  : ''
+              }`}
+              onChange={(e) => updatePaymentData({ studentEmail: e.target.value })}
+            />
           </div>
 
         </div>

@@ -24,6 +24,7 @@ interface ConfirmPayStepProps {
 export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }: ConfirmPayStepProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [virtualAccount, setVirtualAccount] = useState<VirtualAccount | null>(null)
+  const [paymentId, setPaymentId] = useState<string>('')
   const router = useRouter()
 
   const [createPaymentRequest, { isLoading: isCreatingPayment }] = useCreatePaymentRequestMutation()
@@ -41,6 +42,8 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
         payment_request_id: paymentResult.data.id,
         amount: paymentData.amountNGN,
       }
+
+      setPaymentId(paymentResult.data.id)
 
       console.log('Generating virtual account...', virtualAccountData)
       const accountResult = await getVirtualAccount(virtualAccountData).unwrap()
@@ -240,6 +243,7 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
         amountCAD={paymentData.amountCAD}
         nextStep={handleComplete}
         virtualAccount={virtualAccount}
+        payment_reference={paymentId}
         // paymentData={paymentData}
       />
     </div>

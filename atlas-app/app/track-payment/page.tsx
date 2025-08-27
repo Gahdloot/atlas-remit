@@ -18,6 +18,7 @@ export default function TrackPaymentPage() {
   const [email, setEmail] = useState("")
   const [paymentID, setPaymentID] = useState("")
   const [step, setStep] = useState("1") 
+  const [status, setStatus] = useState("") 
   const [trackPayment, { isLoading, error }] = useTrackPaymentMutation()
 
   const validateEmail = (email: string) => {
@@ -36,7 +37,8 @@ export default function TrackPaymentPage() {
             email:email,
             payment_reference:paymentID
         }
-      await trackPayment(payload).unwrap()
+      const res = await trackPayment(payload).unwrap()
+      setStatus(res?.data?.data)
       setStep("3") 
     } catch (err) {
       console.error("Failed to track payment:", err)
@@ -74,7 +76,7 @@ export default function TrackPaymentPage() {
 
                 {/* Payment Progress */}
                 {/* <PaymentProgress currentStatus={paymentStatus} paymentId={paymentID} /> */}
-                <ProgressTracker />
+                <ProgressTracker status={status}/>
 
                 {/* Back Button */}
                 <div className="mt-8">
