@@ -120,7 +120,7 @@ const ProgressTracker = () => {
     )}
 
     {/* Demo Controls */}
-    <div className="text-center">
+    {/* <div className="text-center">
         <p className="text-gray-500 text-sm mb-4">Demo Controls - Click to test different stages</p>
         <div className="flex justify-center gap-3 flex-wrap">
         {steps.map((step) => (
@@ -137,7 +137,7 @@ const ProgressTracker = () => {
             </button>
         ))}
         </div>
-    </div>
+    </div> */}
     </div>
   );
 };

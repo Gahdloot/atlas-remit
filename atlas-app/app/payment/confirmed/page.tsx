@@ -1,12 +1,17 @@
 "use client"
 
 import { PaymentSuccessStep } from "@/components/payment/payment-success"
-
+import { useRouter, useSearchParams } from "next/navigation"
 
 
 export default function PaymentPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams();
+  const email = searchParams.get('email');
 
-
+  const onTrackPayment = () => {
+    router.push("/track-payment")
+  }
 
   return (
 
@@ -29,10 +34,8 @@ export default function PaymentPage() {
           <div className="w-full lg:w-2/3 lg:mx-auto">
           <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
             
-            <PaymentSuccessStep />
+            <PaymentSuccessStep email={email} onTrackPayment={onTrackPayment}/>
           </div>
-          
-            
           </div>
         </div>
       </div>

@@ -73,7 +73,7 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
   }
 
   const handleComplete = () => {
-    router.push("/payment/confirmed")
+    router.push(`/payment/confirmed?email=${paymentData.studentEmail}`)
   }
 
   return (

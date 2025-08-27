@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { StepTitleDescription } from "./step-title-description"
 import { InputWithLabel } from "../ui/input-with-label"
 import { PaymentData } from "@/types/payment"
+import universityList from "@/constants/uni.json"
 
 interface UniversityStepProps {
   paymentData: PaymentData
@@ -21,18 +22,8 @@ interface UniversityStepProps {
 
 
 
-const universities = [
-  "Algoma University",
-  "A.T. Still University",
-  "Alfred University",
-  "Alliant International University",
-  "Ambrose University",
-  "Academy Canada",
-  "Acadia University",
-  "Alberta University of the Arts",
-  "Athabasca University",
-  "Brandon University",
-]
+const universities = universityList.map(u => u.name)
+console.log(universities)
 
 export function UniversityStep({
   paymentData,
@@ -45,7 +36,6 @@ export function UniversityStep({
   const handleNext = () => {
       nextStep()
 
-    console.log(paymentData.university)
     if (paymentData.university) {
       nextStep()
     }
