@@ -3,6 +3,30 @@ from django.db import models
 
 
 
+
+class SchoolPaymentRequestInitializer(models.Model):
+    id = models.UUIDField(
+        primary_key=True,  
+        default=uuid.uuid4,  
+        editable=False 
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    email = models.EmailField()
+    status = models.CharField(
+        choices=(
+            ('pending','pending'),
+            ('completed','completed'),
+        ),
+        max_length=10, 
+        null=True, 
+        blank=True
+    )
+
+
+    def __str__(self):
+        return self.email
+
+
 class SchoolPaymentRequest(models.Model):
     id = models.UUIDField(
         primary_key=True,  
@@ -32,6 +56,7 @@ class SchoolPaymentRequest(models.Model):
     student_personal_email = models.EmailField(null=True, blank=True)
     student_phone_number = models.CharField(max_length=20, null=True, blank=True)
     student_program_studied = models.CharField(max_length=100, null=True, blank=True)
+    payment_initializer = models.OneToOneField(SchoolPaymentRequestInitializer, on_delete=models.SET_NULL, null=True, blank=True)
 
 
 

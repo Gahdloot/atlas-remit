@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 import secrets
 import string
 
-from account.models.payment_request import SchoolPaymentRequest
+from account.models.payment_request import SchoolPaymentRequest, SchoolPaymentRequestInitializer
 from account.serializers import SchoolPaymentRequestSerializer
 from helpers.response import bad_request_response, success_response
 from helpers.upload_to_s3 import upload_base64_to_s3
@@ -90,6 +90,7 @@ class WelcomeEmailView(generics.GenericAPIView):
             return bad_request_response(message="Email address is required")
 
         try:
+            initializer = SchoolPaymentRequestInitializer.objects.create(email=email)
             # Send welcome email
             subject = "Welcome to School Payment System"
             time.sleep(2)
@@ -102,10 +103,10 @@ class WelcomeEmailView(generics.GenericAPIView):
             #     recipient_list=[email],
             #     fail_silently=False,
             # )
-
+            print(str(initializer.id))
             return success_response(
                 message="Welcome email sent successfully",
-                data={'email': email, 'sent_at': timezone.now()}
+                data={'email': email, 'sent_at': timezone.now(),'initializer':str(initializer.id)}
             )
 
         except Exception as e:
