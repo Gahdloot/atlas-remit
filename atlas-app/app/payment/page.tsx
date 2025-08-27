@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
 import { UniversityStep } from "@/components/payment/university-step"
 import { PaymentDetailsStep } from "@/components/payment/payment-details-step"
 import { ConfirmPayStep } from "@/components/payment/confirm-pay-step"
@@ -102,13 +102,15 @@ export default function PaymentPage() {
         {/* Step Content */}
         <div className="flex-1 p-8">
           <div className="w-full lg:w-2/3 lg:mx-auto">
-            <CurrentStepComponent
-              paymentData={paymentData}
-              updatePaymentData={updatePaymentData}
-              nextStep={nextStep}
-              prevStep={prevStep}
-              currentStep={currentStep}
-            />
+            <Suspense fallback={null}>
+              <CurrentStepComponent
+                paymentData={paymentData}
+                updatePaymentData={updatePaymentData}
+                nextStep={nextStep}
+                prevStep={prevStep}
+                currentStep={currentStep}
+              />
+            </Suspense>
           </div>
         </div>
       </div>
