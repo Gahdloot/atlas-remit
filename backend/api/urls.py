@@ -13,6 +13,9 @@ urlpatterns = [
     
     # Payment request creation
     path('payment-requests/', views.SchoolPaymentRequestCreateView.as_view(), name='payment-requests'),
+
+    # track payment
+    path('track-payment/', views.TractPaymentView.as_view(), name='track-payment'),
     
     # One-time virtual account generation
     path('get-one-time-account/', views.OneTimeVirtualAccountView.as_view(), name='one-time-account'),

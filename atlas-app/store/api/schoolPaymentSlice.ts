@@ -169,6 +169,19 @@ export const schoolPaymentSlice = createApi({
       invalidatesTags: ['PaymentVerification', 'PaymentRequest'],
     }),
 
+
+    trackPayment: builder.mutation<
+      ApiResponse<any>,
+      PaymentVerificationRequest
+    >({
+      query: (verificationData) => ({
+        url: `track-payment/`,
+        method: "POST",
+        body: verificationData,
+      }),
+      invalidatesTags: ['PaymentVerification', 'PaymentRequest'],
+    }),
+
     getPaymentVerificationHistory: builder.query<
       ApiResponse<PaymentVerification[]>,
       { payment_request_id?: string; payment_reference?: string }
@@ -325,6 +338,7 @@ export const {
   // Email hooks
   useSendWelcomeEmailMutation,
   useResendEmailMutation,
+  useTrackPaymentMutation,
 
   // Payment request hooks
   useCreatePaymentRequestMutation,

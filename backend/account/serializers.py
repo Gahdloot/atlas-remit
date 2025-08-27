@@ -67,3 +67,9 @@ class VirtualAccountSerializer(serializers.Serializer):
 class PaymentVerificationSerializer(serializers.Serializer):
     payment_reference = serializers.CharField(required=False)
     transaction_id = serializers.CharField(required=False)
+
+
+
+class PaymentTackingSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=False)
+    payment_reference = serializers.CharField(required=False)

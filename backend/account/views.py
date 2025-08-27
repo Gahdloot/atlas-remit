@@ -12,7 +12,7 @@ import secrets
 import string
 
 from account.models.payment_request import SchoolPaymentRequest, SchoolPaymentRequestInitializer
-from account.serializers import SchoolPaymentRequestSerializer
+from account.serializers import PaymentTackingSerializer, SchoolPaymentRequestSerializer
 from helpers.response import bad_request_response, success_response
 from helpers.upload_to_s3 import upload_base64_to_s3
 
@@ -76,6 +76,24 @@ class SchoolPaymentRequestCreateView(generics.GenericAPIView):
 
         return file_url
 
+
+class TractPaymentView(generics.GenericAPIView):
+    """
+    API view to create a new school payment request
+    """
+    serializer_class = PaymentTackingSerializer
+    permission_classes = []
+
+    def post(self, request):
+        data = request.data.copy() 
+        key_to_upload = ['student_document', 'payer_id_document','payment_receipt']
+
+        return success_response(
+            data={ }
+        )
+
+
+# 
 
 class WelcomeEmailView(generics.GenericAPIView):
     """

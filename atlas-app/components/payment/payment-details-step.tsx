@@ -10,6 +10,8 @@ import { StepTitleDescription } from "./step-title-description"
 import { SearchableInput } from "../ui/input-with-label-with-search"
 import { ALL_COUNTRIES } from "@/lib/constants/constants"
 import { PaymentData } from "@/types/payment"
+import { useSearchParams } from 'next/navigation';
+import { useEffect } from "react"
 
 interface PaymentDetailsStepProps {
   paymentData: PaymentData
@@ -26,12 +28,20 @@ export function PaymentDetailsStep({
   prevStep,
   currentStep,
 }: PaymentDetailsStepProps) {
+  const searchParams = useSearchParams();
+  const initializer = searchParams.get('initializer');
+
   const handleNext = () => {
     nextStep()
   }
 
+  useEffect(()=> {
+    updatePaymentData({identifier:initializer})
+  },[initializer])
+
 
   const isFormValid =
+    paymentData?.identifier?.trim() &&
     paymentData.payerFirstName?.trim() &&
     paymentData.payerAddress?.trim() &&
     paymentData.payerFirstName?.trim() &&
