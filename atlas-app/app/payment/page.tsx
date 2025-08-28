@@ -55,30 +55,37 @@ export default function PaymentPage() {
           backgroundPosition: "center",
         }}
       >
-        <div>
-          <Link href="/">
-            <Image 
+        <div className="min-h-screen relative">
+          <div className="absolute top-6 left-4">
+            <Link href="/">
+              <Image 
                 src={'/images/logo-new.png'}
-                width={300}
-                height={200}
+                width={150}
+                height={100}
                 alt="Atlas"
               />
-          </Link>
-          <div className="space-y-6">
-            <h1 className="text-4xl font-bold leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
-              A few clicks away
-              <br />
-              from completing
-              <br />
-              <span className="leading-tight bg-gradient-to-b from-lime-200 via-lime-300 to-green-500 bg-clip-text text-transparent">
-                your payment.
-              </span>
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Send faster, smarter and safer. Oneremit has
-              <br />
-              got you covered.
-            </p>
+            </Link>
+          </div>
+
+          <div className="flex items-center justify-center min-h-screen">
+            <div className=""> {/* or text-left if you prefer */}
+              <div className="">
+                <h1 className="text-4xl font-bold leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
+                  A few clicks away
+                  <br />
+                  from completing
+                  <br />
+                  <span className="leading-tight bg-gradient-to-b from-lime-200 via-lime-300 to-green-500 bg-clip-text text-transparent">
+                    your payment.
+                  </span>
+                </h1>
+                <p className="text-lg text-muted-foreground">
+                  Send faster, smarter and safer. Oneremit has
+                  <br />
+                  got you covered.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
