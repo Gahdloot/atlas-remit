@@ -2,13 +2,10 @@ import base64
 import time
 import uuid
 from django.core.files.base import ContentFile
-from django.core.mail import send_mail
-from django.conf import settings
 from django.utils import timezone
 from account.models.currency import Currency
-from rest_framework import generics, status
-from rest_framework.response import Response
-from datetime import datetime, timedelta
+from rest_framework import generics
+from datetime import timedelta,datetime
 import secrets
 import string
 
@@ -16,19 +13,8 @@ from account.models.payment_request import SchoolPaymentRequest, SchoolPaymentRe
 from account.serializers import CurrencyWithRateSerializer, PaymentTackingSerializer, SchoolPaymentRequestSerializer
 from helpers.response import bad_request_response, success_response
 from helpers.upload_to_s3 import upload_base64_to_s3
-
+from helpers.email_helper import EmailHelper
 # Your existing view
-
-class WelcomeTestEmailView(generics.GenericAPIView):
-    """
-    API view to send welcome email to new users
-    """
-    permission_classes = []
-
-    def get(self, request):
-        return success_response(data={"olakau":90})
-
-
 
 
 
@@ -131,24 +117,22 @@ class WelcomeEmailView(generics.GenericAPIView):
 
     def post(self, request):
         email = request.data.get('email')
-        
+        redirect_url = request.data.get('redirect_url','http://localhost:3000/payment')
         if not email:
             return bad_request_response(message="Email address is required")
 
         try:
             initializer = SchoolPaymentRequestInitializer.objects.create(email=email)
-            # Send welcome email
-            subject = "Welcome to School Payment System"
-            time.sleep(2)
-            # from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@schoolpayment.com')
-            
-            # send_mail(
-            #     subject=subject,
-            #     message=message,
-            #     from_email=from_email,
-            #     recipient_list=[email],
-            #     fail_silently=False,
-            # )
+            context = {
+                "payment_link": f"{redirect_url}?identifier={str(initializer.id)}",
+                "current_year": datetime.now().year
+            }
+            EmailHelper.send_email_with_attachment(
+                subject="Welcome to Atlas by Oneremit",
+                to=[email],
+                template_name="emails/welcome_email.html",
+                context=context
+            )
             print(str(initializer.id))
             return success_response(
                 message="Welcome email sent successfully",
@@ -167,27 +151,34 @@ class ResendEmailView(generics.GenericAPIView):
 
     def post(self, request):
         email = request.data.get('email')
-        email_type = request.data.get('type', 'welcome')  # welcome, notification, etc.
+        initializer = request.data.get('tinitializer') 
+        redirect_url = request.data.get('redirect_url','http://localhost:3000/payment')
         
         if not email:
             return bad_request_response(message="Email address is required")
+        
+        try:
+            payment_initializer_object = SchoolPaymentRequestInitializer.objects.get(id=initializer)
+        except:
+            return bad_request_response(message="Invalid request")
+        
 
         try:
             
-            time.sleep(1)
-            # from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@schoolpayment.com')
-            
-            # send_mail(
-            #     subject=subject,
-            #     message=message,
-            #     from_email=from_email,
-            #     recipient_list=[email],
-            #     fail_silently=False,
-            # )
+            context = {
+                "payment_link": f"{redirect_url}?identifier={str(payment_initializer_object.id)}",
+                "current_year": datetime.now().year
+            }
+            EmailHelper.send_email_with_attachment(
+                subject="Welcome to Atlas by Oneremit",
+                to=[email],
+                template_name="emails/welcome_email.html",
+                context=context
+            )
 
             return success_response(
-                message=f"{email_type.title()} email resent successfully",
-                data={'email': email, 'type': email_type, 'sent_at': timezone.now()}
+                message=f"Email resent successfully",
+                data={'email': email,'sent_at': timezone.now()}
             )
 
         except Exception as e:
@@ -256,6 +247,7 @@ class PaymentVerificationView(generics.GenericAPIView):
 
     def post(self, request):
         payment_reference = request.data.get('payment_reference')
+        redirect_url = request.data.get('redirect_url','http://localhost:3000/track-payment')
         transaction_id = request.data.get('transaction_id')
         
         if not payment_reference and not transaction_id:
@@ -269,16 +261,29 @@ class PaymentVerificationView(generics.GenericAPIView):
             )
 
         try:
-            
-
-            
             # Simulate payment verification logic
             verification_result = self._verify_payment_with_provider(payment_reference, transaction_id)
             
             if verification_result['status'] == 'success':
+                
+
                 # Update payment status in your database here
                 payment_request.processing_status = 'initiated'
                 payment_request.save()
+
+                context = {
+                    "user_name":f"{payment_request.payer_first_name} {payment_request.payer_first_name}",
+                    "track_link": redirect_url,
+                    "payment_id": payment_request.payment_id,
+                    "current_year": datetime.now().year
+                }
+
+                EmailHelper.send_email_with_attachment(
+                    subject="Payment Initiated - Atlas by Oneremit",
+                    to=[payment_request.payment_initializer.email],
+                    template_name="emails/track_payment.html",
+                    context=context
+                )
                 return success_response(
                     message="Payment verified successfully",
                     data={
@@ -346,3 +351,4 @@ class CurrencyRateListView(generics.GenericAPIView):
         queryset = Currency.objects.filter(is_active=True).exclude(code="NGN")
         serializer = CurrencyWithRateSerializer(queryset, many=True)
         return success_response(data=serializer.data)
+    

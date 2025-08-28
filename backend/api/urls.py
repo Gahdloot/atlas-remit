@@ -4,7 +4,6 @@ from account import views
 
 
 urlpatterns = [ 
-    path('', views.WelcomeTestEmailView.as_view(), name='welcome-email'), # testing path
 
     path('get-started/', views.WelcomeEmailView.as_view(), name='welcome-email'),
     
