@@ -60,7 +60,7 @@ class SchoolPaymentRequestCreateView(generics.GenericAPIView):
         return success_response(
             data={
                 'id': payment_request.id,
-                # 'payment_status': payment_request.payment_status,
+                'email':payment_initializer_object.email,
                 'created_at': payment_request.created_at
             }
         )
@@ -130,7 +130,7 @@ class WelcomeEmailView(generics.GenericAPIView):
             EmailHelper.send_email_with_attachment(
                 subject="Welcome to Atlas by Oneremit",
                 to=[email],
-                template_name="emails/welcome_email.html",
+                template_name="emails/welcome.html",
                 context=context
             )
             print(str(initializer.id))
@@ -172,7 +172,7 @@ class ResendEmailView(generics.GenericAPIView):
             EmailHelper.send_email_with_attachment(
                 subject="Welcome to Atlas by Oneremit",
                 to=[email],
-                template_name="emails/welcome_email.html",
+                template_name="emails/welcome.html",
                 context=context
             )
 
@@ -287,6 +287,7 @@ class PaymentVerificationView(generics.GenericAPIView):
                 return success_response(
                     message="Payment verified successfully",
                     data={
+                        'email': payment_request.payment_initializer.email,
                         'payment_reference': payment_reference,
                         'transaction_id': transaction_id,
                         'payment_id': payment_request.payment_id,
@@ -300,6 +301,7 @@ class PaymentVerificationView(generics.GenericAPIView):
                 return success_response(
                     message="Payment is still pending",
                     data={
+                        'email': payment_request.payment_initializer.email,
                         'payment_reference': payment_reference,
                         'payment_id': payment_request.payment_id,
                         'status': 'pending',
@@ -352,3 +354,17 @@ class CurrencyRateListView(generics.GenericAPIView):
         serializer = CurrencyWithRateSerializer(queryset, many=True)
         return success_response(data=serializer.data)
     
+
+
+
+
+# context = {
+#     "payment_link": f"https://jsonformatter.org/",
+#     "current_year": datetime.now().year
+# }
+# EmailHelper.send_email_with_attachment(
+#     subject="Welcome to Atlas by Oneremit",
+#     to=['olakaycoder1@gmail.com'],
+#     template_name="emails/welcome.html",
+#     context=context
+# )

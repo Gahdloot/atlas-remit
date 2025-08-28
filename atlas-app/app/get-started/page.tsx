@@ -29,8 +29,14 @@ export default function GetStartedPage() {
       return;
     }
 
+    // how to get the current domain and append /payment to it for the rediret url
+    const redirectUrl = `${window.location.origin}/payment`;
+    const payload = {
+      email,
+      redirect_url:redirectUrl
+    }
     try {
-      await sendWelcomeEmail({ email }).unwrap();
+      await sendWelcomeEmail(payload).unwrap();
       setStep('2');
     } catch (err) {
       console.error("Failed to send welcome email:", err);
@@ -46,7 +52,12 @@ export default function GetStartedPage() {
   }
 
   try {
-    await resendWelcomeEmail({ email }).unwrap();
+    const redirectUrl = `${window.location.origin}/payment`;
+    const payload = {
+      email,
+      redirect_url:redirectUrl
+    }
+    await resendWelcomeEmail(payload).unwrap();
     alert("Resend email sent successfully.");
   } catch (err) {
     console.error("Failed to resend email:", err);

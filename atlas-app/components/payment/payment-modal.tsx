@@ -107,8 +107,10 @@ export function PaymentModal({ isOpen, onClose, amountNGN, amountCAD, nextStep, 
     
     try {
       console.log("Verifying payment...")
+      const redirectUrl = `${window.location.origin}/track-payments`;
       const payload ={
-        payment_reference
+        payment_reference,
+        redirect_url:redirectUrl
       }
       const isPaymentVerified = await verifyPayment(payload).unwrap()
       
@@ -201,7 +203,7 @@ export function PaymentModal({ isOpen, onClose, amountNGN, amountCAD, nextStep, 
               <div className="flex justify-start">
                 <Button
                   onClick={downloadAsPDFV2}
-                  variant="outline"
+                  // variant="outline"
                   className="border-gray-200 text-gray-700 cursor-pointer bg-white"
                   disabled={isProcessing}
                 >

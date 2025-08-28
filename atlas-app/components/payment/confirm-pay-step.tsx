@@ -25,6 +25,7 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [virtualAccount, setVirtualAccount] = useState<VirtualAccount | null>(null)
   const [paymentId, setPaymentId] = useState<string>('')
+  const [emailUser, setEmailUser] = useState<string>('')
   const router = useRouter()
 
   const [createPaymentRequest, { isLoading: isCreatingPayment }] = useCreatePaymentRequestMutation()
@@ -44,6 +45,7 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
       }
 
       setPaymentId(paymentResult.data.id)
+      setEmailUser(paymentResult.data.email)
 
       console.log('Generating virtual account...', virtualAccountData)
       const accountResult = await getVirtualAccount(virtualAccountData).unwrap()
@@ -76,7 +78,7 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
   }
 
   const handleComplete = () => {
-    router.push(`/payment/confirmed?email=${paymentData.studentEmail}`)
+    router.push(`/payment/confirmed?email=${emailUser}`)
   }
 
   return (

@@ -381,8 +381,8 @@ def calculate_order_total(items: List[OrderItem]) -> float:
 if __name__ == "__main__":
     # Example configuration
     client = create_palmpay_client(
-        merchant_id="your_merchant_id",
-        secret_key="your_secret_key",
+        merchant_id="124092403536161",
+        secret_key="1qSiAgoa30BPSfXSIZb9yxR0f/aAFEjiEFwSa7PbLXFjGUyI1mCSlIHQx7VHy217C3wiv9Em/TQwwnUgj8TBqNElf17YHY2SiFQwFysWxQKBgQDTGrXoituVvB/i6c/pL3FyfsLC4UTwaRpBbybL/sc6gKHYUk95FiwR2MjvlLue8zG070mZDp0/FZZtD6YieH53u4tZFOHr3Or0GmYFd0xQezetki+C7OMsC0ia3yQHkkeRKCHhzgFN3spEPmMowuVn4PsAKfDjgsPoN4MJ46Pk1QKBgQDPzJ6NA4cmm5kDGrz6EHpEFEA1InTInOxa5gLhj7naawh4W51+QIFuPJ8+rA/1yQRT06emBSxXN4gTwr3OZxXoTl+QaPcBdlmkuqVmXSWfHAkMa5u3A+3NauIsZ+DkMJVMgpZJPTsQvecdlAwbYnGdLqJIoc3Xx3U8n41+HVnvQwKBgQCHfBQVm9DUJ7nbOy5JvT41Om+q/ULufLXyGvEuaWTaAiZdHG6PCxDbn2NOiAlmOTTEp/J3Pe7jxuoVMr7wTp70HzSOxp08cDuG0M57YZZj7MDOMA04HOqroM5HP0DzbwlpevVL45forzznUZb4WSU8ZyMQdtp4Wbt79Oyv0x6jxQKBgHm+K/X55yibaJ4FAEqRdNCF/Mgkk78lEOSAdZepGP36T1AUfMUHDc2D/tg8/mzFhJ+IFWSTC1Nd2X+aTJGsm40qvZphpLVanVKBd33tfKknR7XbJbOnvZ7ny/KwOXX3cMEOkPX/xacdW1Zc8mro1h98vt9GzM5qsSj/YWpNz+75AoGAZfXQWQLTvR5fHWaVq2EOG8ob4hkrPzfIgiDdOdmuxor6/A/qDwnOrhEJeFX7fftHVZvQg5xaRGLhMlzcNtHO6/Uc+OrxY1G2pVhFVDTDhHgwtEgER06jq/X0OrtfOfpd1Ss/bCQ8Yuefcgg68oLGnQCmvidxh6fX619Dq2Z/6Cg=",
         sandbox=True
     )
     
@@ -410,8 +410,8 @@ if __name__ == "__main__":
             currency="NGN",
             customer=customer,
             items=items,
-            callback_url="https://mywebhook.com/webhook",
-            return_url="https://your-site.com/return",
+            callback_url="https://webhook-test.com/payload/430ad2bb-70d5-41b9-9b3f-87970528117d",
+            return_url="https://webhook-test.com/payload/430ad2bb-70d5-41b9-9b3f-87970528117d",
             description="Test order"
         )
         
