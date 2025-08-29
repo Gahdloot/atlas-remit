@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import Footer from "@/components/footer";
 import { Menu, X, ChevronDown } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
@@ -81,9 +80,9 @@ export function Navbar() {
             </DropdownMenu>
 
             <div className="hidden md:block">
-                <Button className="bg-lime-400 text-black hover:bg-lime-500 font-medium rounded-full px-6">
+                <Link href='/track-payment' className="bg-lime-400 text-black hover:bg-lime-500 font-medium rounded-full px-6">
                 Track Payment
-                </Button>
+                </Link>
             </div>
           </div>
 
@@ -123,9 +122,9 @@ export function Navbar() {
               <a href="#" className="text-white hover:text-lime-400 transition-colors py-2">
                 Support
               </a>
-              <Button className="bg-lime-400 text-black hover:bg-lime-500 font-medium rounded-full mt-4">
+              <Link href='/track-payment' className="bg-lime-400 text-black hover:bg-lime-500 font-medium rounded-full mt-4">
                 Track Payment
-              </Button>
+              </Link>
             </div>
           </div>
         )}
