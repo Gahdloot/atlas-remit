@@ -3,10 +3,16 @@ import json
 import hashlib
 import hmac
 import time
+import uuid
 from datetime import datetime
 from typing import Dict, Optional, Any, List
 from dataclasses import dataclass
 import logging
+import ssl
+import urllib3
+
+# Disable SSL warnings for testing (remove in production)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -17,14 +23,16 @@ class PalmPayConfig:
     """Configuration class for PalmPay API settings"""
     merchant_id: str
     secret_key: str
-    base_url: str = "https://openapi.palmmerchant.com"
-    sandbox_url: str = "https://sandbox-openapi.palmmerchant.com"
+    app_id: str
+    base_url: str = "https://open-gw-daily.palmpay-inc.com"
+    sandbox_url: str = "https://open-gw-daily.palmpay-inc.com"
     is_sandbox: bool = True
     timeout: int = 30
 
 @dataclass
 class OrderItem:
     """Represents an item in the order"""
+    goods_id: str
     name: str
     price: float
     quantity: int = 1
@@ -34,12 +42,28 @@ class OrderItem:
 @dataclass
 class CustomerInfo:
     """Customer information for the order"""
-    name: str
+    user_id: str
+    user_name: str
     email: str
     phone: str
     address: Optional[str] = None
     city: Optional[str] = None
     country: Optional[str] = None
+
+@dataclass
+class SplitMerchant:
+    """Split merchant information"""
+    split_merchant_id: str
+    split_amount: float
+    remark: str = ""
+
+@dataclass
+class SplitDetail:
+    """Split payment configuration"""
+    is_split: bool
+    split_amount_type: int  # 1 for fixed amount, 2 for percentage
+    split_fee_type: int  # Fee type
+    split_merchant_list: List[SplitMerchant]
 
 class PalmPayException(Exception):
     """Custom exception for PalmPay API errors"""
@@ -67,30 +91,68 @@ class PalmPayCheckout:
         self.base_url = config.sandbox_url if config.is_sandbox else config.base_url
         self.session = requests.Session()
         
+        # Configure SSL settings for testing (remove verify=False in production)
+        self.session.verify = False
+        
         # Set default headers
         self.session.headers.update({
+            'Accept': 'application/json, text/plain, */*',
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'User-Agent': 'PalmPay-Python-SDK/1.0'
+            'CountryCode': 'NG'
         })
     
-    def _generate_signature(self, data: str, timestamp: str) -> str:
+    def _generate_nonce_str(self) -> str:
+        """Generate a random nonce string"""
+        return str(uuid.uuid4()).replace('-', '')[:32]
+    
+    def _generate_signature(self, payload: dict) -> str:
         """
-        Generate HMAC signature for API authentication
+        Generate signature for API authentication based on PalmPay documentation
+        
+        The correct PalmPay signature method:
+        1. Sort parameters by ASCII order
+        2. Create string in format key1=value1&key2=value2...&key=secret_key
+        3. MD5 hash and convert to uppercase
         
         Args:
-            data (str): Request body as JSON string
-            timestamp (str): Unix timestamp
+            payload (dict): Request payload
             
         Returns:
-            str: HMAC signature
+            str: Generated signature
         """
-        message = f"{data}{timestamp}"
-        signature = hmac.new(
-            self.config.secret_key.encode('utf-8'),
-            message.encode('utf-8'),
-            hashlib.sha256
-        ).hexdigest()
+        # Step 1: Create sorted parameter string
+        def flatten_dict(d, parent_key=''):
+            items = []
+            for k, v in sorted(d.items()):  # Sort by key
+                if isinstance(v, dict):
+                    # For nested objects, flatten them
+                    items.extend(flatten_dict(v, f"{parent_key}.{k}" if parent_key else k))
+                elif isinstance(v, list):
+                    # Convert lists to JSON string
+                    items.append((k, json.dumps(v, separators=(',', ':'))))
+                elif v is not None and str(v).strip():  # Skip empty values
+                    items.append((k, str(v)))
+            return items
+        
+        # Get all non-empty parameters and sort them
+        params = []
+        for k, v in sorted(payload.items()):
+            if v is not None and str(v).strip():
+                if isinstance(v, (dict, list)):
+                    params.append((k, json.dumps(v, separators=(',', ':'))))
+                else:
+                    params.append((k, str(v)))
+        
+        # Create string to sign
+        string_to_sign = '&'.join([f"{k}={v}" for k, v in params])
+        string_to_sign += f"&key={self.config.secret_key}"
+        
+        print(f"String to sign: {string_to_sign}")
+        
+        # Step 2: MD5 hash and convert to uppercase
+        signature = hashlib.md5(string_to_sign.encode('utf-8')).hexdigest().upper()
+        print(f"Generated signature: {signature}")
+        
         return signature
     
     def _get_headers(self, payload: dict) -> dict:
@@ -103,14 +165,11 @@ class PalmPayCheckout:
         Returns:
             dict: Headers with signature
         """
-        timestamp = str(int(time.time()))
-        data_string = json.dumps(payload, separators=(',', ':'), sort_keys=True)
-        signature = self._generate_signature(data_string, timestamp)
+        signature = self._generate_signature(payload)
         
         return {
-            'X-Merchant-Id': self.config.merchant_id,
-            'X-Timestamp': timestamp,
-            'X-Signature': signature
+            'Authorization': f'Bearer {self.config.app_id}',
+            'Signature': signature,
         }
     
     def _make_request(self, method: str, endpoint: str, payload: dict = None) -> dict:
@@ -129,11 +188,17 @@ class PalmPayCheckout:
             PalmPayException: If API request fails
         """
         url = f"{self.base_url}{endpoint}"
+        print('===='*10)
+        print(f"Request URL: {url}")
+        print(f"Payload: {json.dumps(payload, indent=2)}")
         
         try:
             if payload:
                 headers = self._get_headers(payload)
                 self.session.headers.update(headers)
+                
+                print(f"Headers: {dict(self.session.headers)}")
+                
                 response = self.session.request(
                     method, 
                     url, 
@@ -149,6 +214,8 @@ class PalmPayCheckout:
             
             # Log request details (excluding sensitive data)
             logger.info(f"{method} {url} - Status: {response.status_code}")
+            print(f"Response Status: {response.status_code}")
+            print(f"Response Text: {response.text}")
             
             response_data = response.json() if response.content else {}
             
@@ -163,6 +230,11 @@ class PalmPayCheckout:
             
             return response_data
             
+        except requests.exceptions.SSLError as e:
+            logger.error(f"SSL Error: {str(e)}")
+            print(f"SSL Error - this might be due to certificate issues with the sandbox environment")
+            print(f"Consider using a different approach or contacting PalmPay support")
+            raise PalmPayException(f"SSL Error: {str(e)}")
         except requests.exceptions.RequestException as e:
             logger.error(f"Request failed: {str(e)}")
             raise PalmPayException(f"Request failed: {str(e)}")
@@ -175,73 +247,116 @@ class PalmPayCheckout:
         amount: float,
         currency: str,
         customer: CustomerInfo,
+        title: str,
         items: List[OrderItem] = None,
+        notify_url: str = None,
         callback_url: str = None,
-        return_url: str = None,
         description: str = None,
-        metadata: dict = None
+        remark: str = None,
+        split_detail: SplitDetail = None
     ) -> dict:
         """
-        Create a new payment order
+        Create a new payment order following PalmPay API specification
         
         Args:
             order_id (str): Unique order identifier
             amount (float): Order amount
             currency (str): Currency code (e.g., 'NGN', 'USD')
             customer (CustomerInfo): Customer information
+            title (str): Order title
             items (List[OrderItem]): List of order items
-            callback_url (str): Webhook URL for payment notifications
-            return_url (str): URL to redirect after payment
+            notify_url (str): Webhook URL for payment notifications
+            callback_url (str): URL to redirect after payment
             description (str): Order description
-            metadata (dict): Additional metadata
+            remark (str): Order remark
+            split_detail (SplitDetail): Split payment configuration
             
         Returns:
             dict: Order creation response with payment URL
         """
+        current_time_ms = int(time.time() * 1000)
+        nonce_str = self._generate_nonce_str()
+        
+        # Build payload with only required and provided optional parameters
         payload = {
+            'requestTime': current_time_ms,
+            'version': 'V1.1',
+            'nonceStr': nonce_str,
+            'amount': int(amount),  # PalmPay expects integer amount in smallest currency unit
             'orderId': order_id,
-            'amount': amount,
-            'currency': currency.upper(),
-            'customer': {
-                'name': customer.name,
-                'email': customer.email,
-                'phone': customer.phone
-            },
-            'timestamp': int(time.time())
+            'title': title,
+            'currency': currency.upper()
         }
         
-        # Add optional customer details
-        if customer.address:
-            payload['customer']['address'] = customer.address
-        if customer.city:
-            payload['customer']['city'] = customer.city
-        if customer.country:
-            payload['customer']['country'] = customer.country
-        
-        # Add items if provided
-        if items:
-            payload['items'] = [
-                {
-                    'name': item.name,
-                    'price': item.price,
-                    'quantity': item.quantity,
-                    'description': item.description,
-                    'category': item.category
-                }
-                for item in items
-            ]
-        
-        # Add optional parameters
-        if callback_url:
-            payload['callbackUrl'] = callback_url
-        if return_url:
-            payload['returnUrl'] = return_url
+        # Add optional parameters only if provided
         if description:
             payload['description'] = description
-        if metadata:
-            payload['metadata'] = metadata
+            
+        if notify_url:
+            payload['notifyUrl'] = notify_url
+            
+        if callback_url:
+            payload['callBackUrl'] = callback_url
+            
+        if remark:
+            payload['remark'] = remark
         
-        response = self._make_request('POST', '/v2/checkout/create-order', payload)
+        # Add customer info as JSON string
+        customer_info = {
+            'userId': customer.user_id,
+            'userName': customer.user_name,
+            'phone': customer.phone,
+            'email': customer.email
+        }
+        
+        if customer.address:
+            customer_info['address'] = customer.address
+        if customer.city:
+            customer_info['city'] = customer.city
+        if customer.country:
+            customer_info['country'] = customer.country
+            
+        payload['customerInfo'] = json.dumps(customer_info, separators=(',', ':'))
+        
+        # Add goods details as JSON string
+        if items:
+            goods_details = []
+            for item in items:
+                item_dict = {
+                    'goodsId': item.goods_id,
+                    'name': item.name,
+                    'price': item.price,
+                    'quantity': item.quantity
+                }
+                
+                # Add optional item details
+                if item.description:
+                    item_dict['description'] = item.description
+                if item.category:
+                    item_dict['category'] = item.category
+                    
+                goods_details.append(item_dict)
+            
+            payload['goodsDetails'] = json.dumps(goods_details, separators=(',', ':'))
+        
+        # Add split details if provided
+        if split_detail and split_detail.is_split:
+            split_data = {
+                'isSplit': split_detail.is_split,
+                'splitAmountType': split_detail.split_amount_type,
+                'splitFeeType': split_detail.split_fee_type,
+                'splitMerchantList': [
+                    {
+                        'splitMerchantId': merchant.split_merchant_id,
+                        'splitAmount': int(merchant.split_amount),
+                        'remark': merchant.remark
+                    }
+                    for merchant in split_detail.split_merchant_list
+                ]
+            }
+            payload['splitDetail'] = json.dumps(split_data, separators=(',', ':'))
+        
+        response = self._make_request('POST', '/api/v2/payment/merchant/createorder', payload)
         
         logger.info(f"Order created successfully: {order_id}")
         return response
@@ -256,39 +371,42 @@ class PalmPayCheckout:
         Returns:
             dict: Order status information
         """
+        current_time_ms = int(time.time() * 1000)
+        nonce_str = self._generate_nonce_str()
+        
         payload = {
-            'orderId': order_id,
-            'timestamp': int(time.time())
+            'requestTime': current_time_ms,
+            'version': 'V1.1',
+            'nonceStr': nonce_str,
+            'orderId': order_id
         }
         
-        response = self._make_request('POST', '/v2/checkout/query-order', payload)
+        response = self._make_request('POST', '/api/v2/payment/merchant/queryorder', payload)
         
         logger.info(f"Retrieved status for order: {order_id}")
         return response
     
-    def verify_webhook(self, payload: str, signature: str, timestamp: str) -> bool:
+    def verify_webhook_signature(self, payload: dict, signature: str) -> bool:
         """
         Verify webhook signature for security
         
         Args:
-            payload (str): Webhook payload as string
+            payload (dict): Webhook payload
             signature (str): Signature from webhook headers
-            timestamp (str): Timestamp from webhook headers
             
         Returns:
             bool: True if signature is valid
         """
-        expected_signature = self._generate_signature(payload, timestamp)
-        return hmac.compare_digest(signature, expected_signature)
+        expected_signature = self._generate_signature(payload)
+        return hmac.compare_digest(signature.upper(), expected_signature)
     
-    def handle_webhook(self, request_data: dict, signature: str, timestamp: str) -> dict:
+    def handle_webhook(self, request_data: dict, signature: str = None) -> dict:
         """
         Handle incoming webhook notification
         
         Args:
             request_data (dict): Webhook payload
-            signature (str): Webhook signature
-            timestamp (str): Webhook timestamp
+            signature (str): Webhook signature (optional)
             
         Returns:
             dict: Processed webhook data
@@ -296,63 +414,33 @@ class PalmPayCheckout:
         Raises:
             PalmPayException: If webhook verification fails
         """
-        payload_string = json.dumps(request_data, separators=(',', ':'), sort_keys=True)
-        
-        if not self.verify_webhook(payload_string, signature, timestamp):
+        if signature and not self.verify_webhook_signature(request_data, signature):
             raise PalmPayException("Invalid webhook signature")
         
-        event_type = request_data.get('eventType')
-        order_data = request_data.get('data', {})
+        order_id = request_data.get('orderId')
+        status = request_data.get('status')
         
-        logger.info(f"Webhook received: {event_type} for order {order_data.get('orderId')}")
+        logger.info(f"Webhook received for order {order_id} with status {status}")
         
         return {
-            'event_type': event_type,
-            'order_id': order_data.get('orderId'),
-            'status': order_data.get('status'),
-            'amount': order_data.get('amount'),
-            'currency': order_data.get('currency'),
-            'transaction_id': order_data.get('transactionId'),
-            'payment_method': order_data.get('paymentMethod'),
-            'timestamp': timestamp,
+            'order_id': order_id,
+            'status': status,
+            'amount': request_data.get('amount'),
+            'currency': request_data.get('currency'),
+            'transaction_id': request_data.get('transactionId'),
+            'payment_method': request_data.get('paymentMethod'),
             'raw_data': request_data
         }
-    
-    def refund_order(self, order_id: str, amount: float = None, reason: str = None) -> dict:
-        """
-        Initiate refund for an order
-        
-        Args:
-            order_id (str): Order identifier
-            amount (float): Refund amount (full refund if not specified)
-            reason (str): Refund reason
-            
-        Returns:
-            dict: Refund response
-        """
-        payload = {
-            'orderId': order_id,
-            'timestamp': int(time.time())
-        }
-        
-        if amount is not None:
-            payload['amount'] = amount
-        if reason:
-            payload['reason'] = reason
-        
-        response = self._make_request('POST', '/v2/checkout/refund', payload)
-        
-        logger.info(f"Refund initiated for order: {order_id}")
-        return response
 
 # Helper functions for easy usage
-def create_palmpay_client(merchant_id: str, secret_key: str, sandbox: bool = True) -> PalmPayCheckout:
+def create_palmpay_client(merchant_id: str, secret_key: str, app_id: str, sandbox: bool = True) -> PalmPayCheckout:
     """
     Create a PalmPay client with simplified configuration
     
     Args:
         merchant_id (str): PalmPay merchant ID
         secret_key (str): PalmPay secret key
+        app_id (str): PalmPay app ID
         sandbox (bool): Use sandbox environment
         
     Returns:
@@ -361,6 +449,7 @@ def create_palmpay_client(merchant_id: str, secret_key: str, sandbox: bool = Tru
     config = PalmPayConfig(
         merchant_id=merchant_id,
         secret_key=secret_key,
+        app_id=app_id,
         is_sandbox=sandbox
     )
     return PalmPayCheckout(config)
@@ -377,10 +466,11 @@ def calculate_order_total(items: List[OrderItem]) -> float:
     """
     return sum(item.price * item.quantity for item in items)
 
-# Example usage
+# Example usage with SSL workaround
 if __name__ == "__main__":
     # Example configuration
     client = create_palmpay_client(
+        app_id='L240924064462689773201',
         merchant_id="124092403536161",
         secret_key="1qSiAgoa30BPSfXSIZb9yxR0f/aAFEjiEFwSa7PbLXFjGUyI1mCSlIHQx7VHy217C3wiv9Em/TQwwnUgj8TBqNElf17YHY2SiFQwFysWxQKBgQDTGrXoituVvB/i6c/pL3FyfsLC4UTwaRpBbybL/sc6gKHYUk95FiwR2MjvlLue8zG070mZDp0/FZZtD6YieH53u4tZFOHr3Or0GmYFd0xQezetki+C7OMsC0ia3yQHkkeRKCHhzgFN3spEPmMowuVn4PsAKfDjgsPoN4MJ46Pk1QKBgQDPzJ6NA4cmm5kDGrz6EHpEFEA1InTInOxa5gLhj7naawh4W51+QIFuPJ8+rA/1yQRT06emBSxXN4gTwr3OZxXoTl+QaPcBdlmkuqVmXSWfHAkMa5u3A+3NauIsZ+DkMJVMgpZJPTsQvecdlAwbYnGdLqJIoc3Xx3U8n41+HVnvQwKBgQCHfBQVm9DUJ7nbOy5JvT41Om+q/ULufLXyGvEuaWTaAiZdHG6PCxDbn2NOiAlmOTTEp/J3Pe7jxuoVMr7wTp70HzSOxp08cDuG0M57YZZj7MDOMA04HOqroM5HP0DzbwlpevVL45forzznUZb4WSU8ZyMQdtp4Wbt79Oyv0x6jxQKBgHm+K/X55yibaJ4FAEqRdNCF/Mgkk78lEOSAdZepGP36T1AUfMUHDc2D/tg8/mzFhJ+IFWSTC1Nd2X+aTJGsm40qvZphpLVanVKBd33tfKknR7XbJbOnvZ7ny/KwOXX3cMEOkPX/xacdW1Zc8mro1h98vt9GzM5qsSj/YWpNz+75AoGAZfXQWQLTvR5fHWaVq2EOG8ob4hkrPzfIgiDdOdmuxor6/A/qDwnOrhEJeFX7fftHVZvQg5xaRGLhMlzcNtHO6/Uc+OrxY1G2pVhFVDTDhHgwtEgER06jq/X0OrtfOfpd1Ss/bCQ8Yuefcgg68oLGnQCmvidxh6fX619Dq2Z/6Cg=",
         sandbox=True
@@ -388,38 +478,47 @@ if __name__ == "__main__":
     
     # Example customer
     customer = CustomerInfo(
-        name="John Doe",
-        email="john@example.com",
-        phone="+234812345678",
-        address="123 Main St",
-        city="Lagos",
-        country="Nigeria"
+        user_id="1231231",
+        user_name="testxz",
+        email="test@test.com",
+        phone="07011698742"
     )
     
     # Example order items
     items = [
-        OrderItem(name="Product 1", price=1000.0, quantity=2),
-        OrderItem(name="Product 2", price=500.0, quantity=1)
+        OrderItem(
+            goods_id="1", 
+            name="Product 1", 
+            price=100.0, 
+            quantity=1,
+            description="Test product"
+        ),
+        OrderItem(
+            goods_id="2", 
+            name="Product 2", 
+            price=100.0, 
+            quantity=1
+        )
     ]
     
+    # Simplified example without split payment first
     try:
         # Create order
         response = client.create_order(
-            order_id="ORDER_123456",
-            amount=calculate_order_total(items),
+            order_id="testc9ffae997fc2",  # Changed order ID
+            amount=200,  # Total amount
             currency="NGN",
             customer=customer,
+            title="pay",
             items=items,
-            callback_url="https://webhook-test.com/payload/430ad2bb-70d5-41b9-9b3f-87970528117d",
-            return_url="https://webhook-test.com/payload/430ad2bb-70d5-41b9-9b3f-87970528117d",
-            description="Test order"
+            notify_url="https://xx.cn/callback/payment",
+            callback_url="http://returnurl",
+            description="pay some thing",
+            remark="test"
+            # Removed split_detail for initial testing
         )
         
         print("Order created:", response)
-        
-        # Get order status
-        status = client.get_order_status("ORDER_123456")
-        print("Order status:", status)
         
     except PalmPayException as e:
         print(f"PalmPay error: {e}")

@@ -124,7 +124,7 @@ class WelcomeEmailView(generics.GenericAPIView):
         try:
             initializer = SchoolPaymentRequestInitializer.objects.create(email=email)
             context = {
-                "payment_link": f"{redirect_url}?identifier={str(initializer.id)}",
+                "payment_link": f"{redirect_url}?initializer={str(initializer.id)}",
                 "current_year": datetime.now().year
             }
             EmailHelper.send_email_with_attachment(
@@ -166,7 +166,7 @@ class ResendEmailView(generics.GenericAPIView):
         try:
             
             context = {
-                "payment_link": f"{redirect_url}?identifier={str(payment_initializer_object.id)}",
+                "payment_link": f"{redirect_url}?initializer={str(payment_initializer_object.id)}",
                 "current_year": datetime.now().year
             }
             EmailHelper.send_email_with_attachment(

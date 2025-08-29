@@ -12,7 +12,13 @@ class SchoolPaymentRequestSerializer(serializers.ModelSerializer):
     studentEmail = serializers.EmailField(source='student_email')
     studentPersonalEmail = serializers.EmailField(source='student_personal_email', allow_null=True, required=False)
     studentPhoneNumber = serializers.CharField(source='student_phone_number', allow_null=True, required=False)
-    studentDateOfBirth = serializers.DateField(source='student_date_of_birth', allow_null=True, required=False)
+    # studentDateOfBirth = serializers.DateField(source='student_date_of_birth', allow_null=True, required=False)
+    studentDateOfBirth = serializers.DateField(
+        source='student_date_of_birth',
+        input_formats=['%Y-%m-%d', '%d-%m-%Y'],
+        allow_null=True,
+        required=False
+    )
     studentExpectedYearOfCompletion = serializers.CharField(source='student_expected_year_of_completion', allow_null=True, required=False)
     studentInstitution = serializers.CharField(source='student_institution', allow_null=True, required=False)
     studentProgramStudied = serializers.CharField(source='student_program_studied', allow_null=True, required=False)
