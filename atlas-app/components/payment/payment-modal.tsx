@@ -107,7 +107,7 @@ export function PaymentModal({ isOpen, onClose, amountNGN, amountCAD, nextStep, 
     
     try {
       console.log("Verifying payment...")
-      const redirectUrl = `${window.location.origin}/track-payments`;
+      const redirectUrl = `${window.location.origin}/track-payment`;
       const payload ={
         payment_reference,
         redirect_url:redirectUrl
