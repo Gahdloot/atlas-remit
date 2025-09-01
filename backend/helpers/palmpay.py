@@ -10,6 +10,12 @@ from dataclasses import dataclass
 import logging
 import ssl
 import urllib3
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
+from cryptography.hazmat.backends import default_backend
+import base64
+import hashlib
 
 # Disable SSL warnings for testing (remove in production)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -316,7 +322,7 @@ class PalmPayCheckout:
         if customer.country:
             customer_info['country'] = customer.country
             
-        payload['customerInfo'] = json.dumps(customer_info, separators=(',', ':'))
+        # payload['customerInfo'] = json.dumps(customer_info, separators=(',', ':'))
         
         # Add goods details as JSON string
         if items:
@@ -432,6 +438,71 @@ class PalmPayCheckout:
             'raw_data': request_data
         }
 
+
+
+
+    def _generate_signature_new(self, payload: dict) -> str:
+        """
+        Generate signature for API authentication based on PalmPay documentation
+        
+        Steps:
+        1. Sort parameters by ASCII order and concatenate into key1=value1&key2=value2...
+        2. Perform MD5 hash and convert to uppercase
+        3. Sign the MD5 hash with SHA1WithRSA using the private key
+        
+        Args:
+            payload (dict): Request payload
+            
+        Returns:
+            str: Generated signature
+        """
+        # Step 1: Create sorted parameter string
+        def flatten_dict(d, parent_key=''):
+            items = []
+            for k, v in sorted(d.items()):  # Sort by key
+                if isinstance(v, dict):
+                    items.extend(flatten_dict(v, f"{parent_key}.{k}" if parent_key else k))
+                elif isinstance(v, list):
+                    items.append((k, json.dumps(v, separators=(',', ':'))))
+                elif v is not None and str(v).strip():  # Skip empty values
+                    items.append((k, str(v)))
+            return items
+        
+        # Get all non-empty parameters and sort them
+        params = flatten_dict(payload)
+        string_to_sign = '&'.join([f"{k}={v}" for k, v in params])
+        
+        print(f"String to sign (Step 1): {string_to_sign}")
+        
+        # Step 2: MD5 hash and convert to uppercase
+        md5_hash = hashlib.md5(string_to_sign.encode('utf-8')).hexdigest().upper()
+        print(f"MD5 hash (Step 2): {md5_hash}")
+        
+        # Step 3: Sign with SHA1WithRSA using the private key
+        try:
+            # Decode the Base64-encoded private key
+            private_key_bytes = base64.b64decode(self.config.secret_key)
+            private_key = load_pem_private_key(private_key_bytes, password=None, backend=default_backend())
+            
+            # Sign the MD5 hash
+            signature_bytes = private_key.sign(
+                md5_hash.encode('utf-8'),
+                padding.PKCS1v15(),
+                hashes.SHA1()
+            )
+            
+            # Encode the signature to Base64
+            signature = base64.b64encode(signature_bytes).decode('utf-8')
+            print(f"Generated signature (Step 3): {signature}")
+            
+            return signature
+        except Exception as e:
+            logger.error(f"Signature generation failed: {str(e)}")
+            raise PalmPayException(f"Failed to generate signature: {str(e)}")
+
+
+
+
 # Helper functions for easy usage
 def create_palmpay_client(merchant_id: str, secret_key: str, app_id: str, sandbox: bool = True) -> PalmPayCheckout:
     """
@@ -492,12 +563,6 @@ if __name__ == "__main__":
             price=100.0, 
             quantity=1,
             description="Test product"
-        ),
-        OrderItem(
-            goods_id="2", 
-            name="Product 2", 
-            price=100.0, 
-            quantity=1
         )
     ]
     
@@ -523,4 +588,4 @@ if __name__ == "__main__":
     except PalmPayException as e:
         print(f"PalmPay error: {e}")
         if e.response_data:
-            print("Error details:", e.response_data)
+            print("Error details:", e.response_data)            

@@ -2,7 +2,9 @@ asgiref==3.9.1
 boto3==1.40.16
 botocore==1.40.16
 certifi==2025.8.3
+cffi==1.17.1
 charset-normalizer==3.4.3
+cryptography==45.0.6
 Django==5.2.5
 django-cors-headers==4.7.0
 django-environ==0.12.0
@@ -12,6 +14,8 @@ idna==3.10
 jmespath==1.0.1
 MarkupSafe==3.0.2
 psycopg2-binary==2.9.10
+pycparser==2.22
+pycryptodome==3.23.0
 python-dateutil==2.9.0.post0
 python-decouple==3.8
 python-http-client==3.3.7
@@ -22,4 +26,3 @@ six==1.17.0
 sqlparse==0.5.3
 urllib3==2.5.0
 Werkzeug==3.1.3
-
