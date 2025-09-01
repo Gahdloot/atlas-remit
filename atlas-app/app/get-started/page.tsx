@@ -169,7 +169,7 @@ export default function GetStartedPage() {
                   border-2 
                   border-lime-400 
                   rounded-lg 
-                  text-gray-500 
+                  text-white 
                   placeholder:text-gray-500
                   h-12 
                   sm:h-14 
