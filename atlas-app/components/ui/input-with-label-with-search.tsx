@@ -48,7 +48,7 @@ export function SearchableInput({
         onFocus={() => setShowDropdown(true)}
         onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
         autoComplete="off"
-        inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10" // add right padding
+        inputClassName="bg-[#f8f8f8] border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10" // add right padding
       />
       {/* Search Icon positioned to the right */}
       {/* <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">

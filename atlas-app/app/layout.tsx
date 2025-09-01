@@ -80,7 +80,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${workSans.variable} ${poppins.variable} antialiased`}>
-      <body className="font-sans">
+     <body className="font-sans">
         <StoreProvider>
           {children}
         </StoreProvider>

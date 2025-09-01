@@ -12,7 +12,7 @@ export function FeatureCard({ icon, title, description }: FeatureCardProps) {
          {icon}
       </div>
       {/* <div className="mb-4">{icon}</div> */}
-      <h3 className="text-lime-50 font-semibold text-lg mb-2">{title}</h3>
+      <h3 className="text-lime-50 font-work-sans-override font-semibold text-lg mb-2">{title}</h3>
       <p className="text-gray-400 text-medium leading-relaxed">{description}</p>
     </div>
   )

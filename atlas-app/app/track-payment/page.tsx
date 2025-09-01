@@ -106,7 +106,7 @@ export default function TrackPaymentPage() {
                     {step == "1" ? (
                       <>
                         <div className="space-y-1 mb-6">
-                          <h1 className="text-white text-2xl sm:text-3xl font-normal leading-tight">
+                          <h1 className="text-white text-2xl sm:text-3xl  font-normal leading-tight">
                             Hi there, <span className="text-lime-200">scholar!</span>
                           </h1>
                           <h2 className="text-white text-2xl sm:text-3xl font-normal">Track your tuition payment</h2>
@@ -130,8 +130,7 @@ export default function TrackPaymentPage() {
                           placeholder="kunlearo3@gmail.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="
-                            bg-transparent 
+                          className=" 
                             border-2 
                             border-lime-400 
                             rounded-lg 
@@ -156,7 +155,7 @@ export default function TrackPaymentPage() {
                           value={paymentID}
                           onChange={(e) => setPaymentID(e.target.value)}
                           className="
-                            bg-transparent 
+                         bg-[#f8f8f8]
                             border-2 
                             border-lime-400 
                             rounded-lg 
