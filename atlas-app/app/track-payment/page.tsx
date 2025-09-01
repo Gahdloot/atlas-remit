@@ -106,9 +106,6 @@ export default function TrackPaymentPage() {
                     {step == "1" ? (
                       <>
                         <div className="space-y-1 mb-6">
-                          <h1 className="text-white text-2xl sm:text-3xl  font-normal leading-tight">
-                            Hi there, <span className="text-lime-200">scholar!</span>
-                          </h1>
                           <h2 className="text-white text-2xl sm:text-3xl font-normal">Track your tuition payment</h2>
                           <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
                             Enter your email and payment ID to track your payment
@@ -134,12 +131,12 @@ export default function TrackPaymentPage() {
                             border-2 
                             border-lime-400 
                             rounded-lg 
-                            text-white 
+                            text-gray-500 
+                            text-base
                             placeholder:text-gray-500
                             h-12 
                             sm:h-14 
                             px-4
-                            text-base
                             focus:border-lime-300
                             focus:ring-lime-400/20
                             focus:ring-2
@@ -159,12 +156,11 @@ export default function TrackPaymentPage() {
                             border-2 
                             border-lime-400 
                             rounded-lg 
-                            text-white 
+                            text-gray-500 
                             placeholder:text-gray-500
                             h-12 
                             sm:h-14 
                             px-4
-                            text-base
                             focus:border-lime-300
                             focus:ring-lime-400/20
                             focus:ring-2
