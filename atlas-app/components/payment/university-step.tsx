@@ -135,7 +135,7 @@ export function UniversityStep({
         />
 
         <div className="space-y-2 mt-4">
-          <label className="text-gray-600 mb-2 text-base font-bold">Choose University</label>
+          <label className="text-sm font-medium text-[#939b98]">Choose University</label>
           <div className="relative mt-2">
             <button
               onClick={() => setIsOpen(!isOpen)}
@@ -242,7 +242,7 @@ export function UniversityStep({
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2 w-full">
-              <label className="text-sm font-bold text-[#939b98]">Expected Year of Completion</label>
+              <label className="text-sm font-medium text-[#939b98]">Expected Year of Completion</label>
               <Select
                 value={paymentData.studentExpectedYearOfCompletion}
                 onValueChange={(value) => updatePaymentData({ studentExpectedYearOfCompletion: value })}
@@ -259,7 +259,7 @@ export function UniversityStep({
               </Select>
             </div>
             <div className="space-y-2 w-full">
-              <label className="text-sm font-bold text-[#939b98]">Program Studied</label>
+              <label className="text-sm font-medium text-[#939b98]">Program Studied</label>
               <Select
                 value={paymentData.studentProgramStudied}
                 onValueChange={(value) => updatePaymentData({ studentProgramStudied: value })}
@@ -276,7 +276,7 @@ export function UniversityStep({
             </div>
           </div>
           <div className="space-y-2 w-full">
-            <label className="text-sm font-bold text-[#939b98]">Payment Type</label>
+            <label className="text-sm font-medium text-[#939b98]">Payment Type</label>
             <Select
               value={paymentData.paymentType}
               onValueChange={(value) => updatePaymentData({ paymentType: value })}
@@ -360,14 +360,14 @@ export function UniversityStep({
           <Button
             onClick={prevStep}
             variant="ghost"
-            className="flex-1 w-full py-6 md:flex-none bg-white text-base font-bold text-gray-600 hover:text-gray-900 cursor-pointer"
+            className="flex-1 w-full py-6 md:flex-none bg-white text-base font-medium text-gray-600 hover:text-gray-900 cursor-pointer"
           >
             Go back
           </Button>
           <Button
             onClick={handleNext}
             className={cn(
-              "flex-1 md:flex-none px-8 w-full py-6 cursor-pointer text-base font-bold",
+              "flex-1 md:flex-none px-8 w-full py-6 cursor-pointer text-base font-medium",
               isFormValid
                 ? "bg-lime-500 hover:bg-lime-600 text-white"
                 : "bg-gray-300 text-gray-400 cursor-not-allowed"

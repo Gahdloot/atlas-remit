@@ -46,81 +46,79 @@ export default function PaymentPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Side */}
-      <div
-        className="w-1/3 hidden text-white md:flex flex-col justify-between p-12"
-        style={{
-          backgroundImage: "url('/images/background.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="min-h-screen relative">
-          <div className="absolute top-6 left-4">
-            <Link href="/">
-              <Image 
-                src={'/images/logo-new.png'}
-                width={150}
-                height={100}
-                alt="Atlas"
-              />
-            </Link>
-          </div>
-
-          <div className="flex items-center justify-center min-h-screen">
-            <div className=""> {/* or text-left if you prefer */}
-              <div className="">
-                <h1 className="text-4xl font-bold leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
-                  A few clicks away
-                  <br />
-                  from completing
-                  <br />
-                  <span className="leading-tight bg-gradient-to-b from-lime-200 via-lime-300 to-green-500 bg-clip-text text-transparent">
-                    your payment.
-                  </span>
-                </h1>
-                <p className="text-lg text-muted-foreground">
-                  Send faster, smarter and safer. <span className=" text-white">ATLAS has</span>
-                  <br />
-                  <span className=" text-white">got you covered.</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+  {/* Left Side - Fixed */}
+  <div
+    className="hidden md:flex flex-col justify-between p-12 text-white fixed top-0 left-0 h-screen w-1/3"
+    style={{
+      backgroundImage: "url('/images/background.png')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}
+  >
+    <div className="relative h-full">
+      <div className="absolute top-6 left-4">
+        <Link href="/">
+          <Image 
+            src={'/images/logo-new.png'}
+            width={150}
+            height={100}
+            alt="Atlas"
+          />
+        </Link>
       </div>
 
-      {/* Right Side */}
-      <div
-        className={`w-full lg:w-2/3 bg-[#f8f8f8] flex flex-col`}
-      >
-        {/* Step Indicator */}
-        {(
-          <div className="md:p-8 border-b border-gray-100 w-full lg:w-2/3 md:mx-auto">
-            <StepIndicator
-            currentStep={currentStep}
-            steps={steps.slice(0).map(({ title, icon , IconImage}) => ({ title, icon, IconImage }))}
-          />
-
-          </div>
-        )}
-
-
-        {/* Step Content */}
-        <div className="flex-1 p-8">
-          <div className="w-full lg:w-2/3 lg:mx-auto">
-            <Suspense fallback={null}>
-              <CurrentStepComponent
-                paymentData={paymentData}
-                updatePaymentData={updatePaymentData}
-                nextStep={nextStep}
-                prevStep={prevStep}
-                currentStep={currentStep}
-              />
-            </Suspense>
-          </div>
+      <div className="flex items-center justify-center h-full">
+        <div>
+          <h1 className="text-5xl font-semibold font-work-sans-override leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
+            A few clicks away
+            <br />
+            from completing
+            <br />
+            <span className="leading-tight bg-gradient-to-b from-lime-200 via-lime-300 to-green-500 bg-clip-text text-transparent">
+              your payment.
+            </span>
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            Send faster, smarter and safer.{" "}
+            <span className="text-white">ATLAS has</span>
+            <br />
+            <span className="text-white">got you covered.</span>
+          </p>
         </div>
       </div>
     </div>
+  </div>
+
+  {/* Right Side - Push with margin */}
+  <div className="w-full md:ml-[33.333%] bg-[#f8f8f8] flex flex-col">
+    {/* Step Indicator */}
+    <div className="md:p-8 border-b border-gray-100 w-full lg:w-2/3 md:mx-auto">
+      <StepIndicator
+        currentStep={currentStep}
+        steps={steps.map(({ title, icon, IconImage }) => ({
+          title,
+          icon,
+          IconImage,
+        }))}
+      />
+    </div>
+
+    {/* Step Content */}
+    <div className="flex-1 p-8">
+      <div className="w-full lg:w-2/3 lg:mx-auto">
+        <Suspense fallback={null}>
+          <CurrentStepComponent
+            paymentData={paymentData}
+            updatePaymentData={updatePaymentData}
+            nextStep={nextStep}
+            prevStep={prevStep}
+            currentStep={currentStep}
+          />
+        </Suspense>
+      </div>
+    </div>
+  </div>
+</div>
+
   )
 }
