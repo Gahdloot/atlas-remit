@@ -39,13 +39,13 @@ jobs:
             
             echo "Using: $DOCKER_COMPOSE"
             
-            # Stop containers
-            echo "🛑 Stopping containers..."
-            $DOCKER_COMPOSE down
-            
-            # Rebuild and start containers
-            echo "🔨 Building and starting containers..."
-            $DOCKER_COMPOSE up -d --build
+                         # Stop containers
+             echo "🛑 Stopping containers..."
+             $DOCKER_COMPOSE -f docker-compose.prod.yml down
+             
+             # Rebuild and start containers
+             echo "🔨 Building and starting containers..."
+             $DOCKER_COMPOSE -f docker-compose.prod.yml up -d --build
             
             # Clean up unused Docker images
             echo "🧹 Cleaning up unused Docker images..."
@@ -60,15 +60,15 @@ jobs:
             cd /app/test_atlas
             echo "🔍 Verifying deployment..."
             
-            # Use the same logic to determine docker compose command
-            if command -v docker-compose &> /dev/null; then
-              docker-compose ps
-            elif docker compose version &> /dev/null; then
-              docker compose ps
-            else
-              echo "❌ Docker compose not available for verification"
-              docker ps
-            fi
+                         # Use the same logic to determine docker compose command
+             if command -v docker-compose &> /dev/null; then
+               docker-compose -f docker-compose.prod.yml ps
+             elif docker compose version &> /dev/null; then
+               docker compose -f docker-compose.prod.yml ps
+             else
+               echo "❌ Docker compose not available for verification"
+               docker ps
+             fi
             
             echo "📊 Deployment verification completed!"
           EOF
