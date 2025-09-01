@@ -5,32 +5,13 @@ import Image from "next/image"
 import ExchangeRatesSection from "./exchange-rates-section"
 
 export function HowItWorks() {
-  const steps1 = [
-    {
-      number: "1",
-      title: "Email address",
-      description: "Send link to email address.",
-      icon: User,
-    },
-    {
-      number: "2", 
-      title: "FX rates",
-      description: "Check live FX rates for conversion",
-      icon: Repeat,
-    },
-    {
-      number: "3",
-      title: "Pay tuition",
-      description: "Enter details and pay.",
-      icon: CreditCard,
-    },
-  ]
+
   const steps = [
   {
     number: "1",
     title: "Email address",
     description: "Send link to email address.",
-    image: "/images/home-section/user.png", // ✅ your image path
+    image: "/images/home-section/user.png", 
   },
   {
     number: "2", 
