@@ -51,7 +51,7 @@ export function HowItWorks() {
             </h2>
 
             <p className="text-gray-400 max-w-xl mx-auto">
-              Send tution payments confidentially with ATLA, you get secure, transparent rates, and fees design to save you money
+              Send tution payments confidentially with ATLAS by Oneremit, you get secure, transparent rates, and fees design to save you money
             </p>
           </div>
 
