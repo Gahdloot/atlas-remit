@@ -82,7 +82,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://159.65.165.21:3000"
+]
+CORS_ALLOW_METHODS = (
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+)
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
