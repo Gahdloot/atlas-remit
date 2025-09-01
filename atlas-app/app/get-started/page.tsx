@@ -166,7 +166,6 @@ export default function GetStartedPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value )}
                 className="
-                  bg-transparent 
                   border-2 
                   border-lime-400 
                   rounded-lg 

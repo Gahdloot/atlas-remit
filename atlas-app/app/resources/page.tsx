@@ -29,7 +29,7 @@ export default function ResourcesPage() {
 
     <section className=" py-20">
         <div className="px-6 lg:px-12 py-12 lg:py-24 min-h-[calc(100vh-200px)] max-w-7xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
+          <h1 className="text-5xl md:text-6xl font-work-sans-override font-semibold mb-6 leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
             The ATLAS
             <br />
             <span className="">Knowledge Base</span>
@@ -79,7 +79,7 @@ export default function ResourcesPage() {
       {/* Featured Articles */}
       <section className="px-6 py-16">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold mb-8  leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">Featured Articles</h2>
+          <h2 className="text-3xl font-work-sans-override font-semibold mb-8  leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">Featured Articles</h2>
 
           <ArticleCard
             title="Deadline Coming? How to Get School Fees paid on Time"
@@ -103,7 +103,7 @@ export default function ResourcesPage() {
       {/* Other Articles */}
       <section className="px-6 py-16">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold mb-8  leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">Other Articles</h2>
+          <h2 className="text-3xl font-work-sans-override font-semibold mb-8  leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">Other Articles</h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 9 }).map((_, index) => (

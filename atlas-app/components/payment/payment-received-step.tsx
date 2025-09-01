@@ -41,7 +41,7 @@ export function PaymentReceivedStep({ paymentData, updatePaymentData, nextStep }
               placeholder="kunleolad@gmail.com"
               value={paymentData.email}
               onChange={(e) => updatePaymentData({ email: e.target.value })}
-              className="bg-input border-border text-white py-4 lg:py-7 mt-4 "
+              className=" border-border text-white py-4 lg:py-7 mt-4 "
             />
           </div>
           <Button

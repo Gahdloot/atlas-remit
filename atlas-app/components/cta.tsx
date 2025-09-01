@@ -21,7 +21,7 @@ export default function CTA() {
             <div className="relative z-10 flex items-center px-6 lg:px-12 py-12  max-w-7xl mx-auto  mt-8 ">
                 <div className="w-full lg:w-[450px] space-y-8 ">
                 <div className="relative">
-                    <h1 className="relative text-4xl font-bold mb-6  leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
+                    <h1 className="relative text-4xl font-work-sans-override font-semibold mb-6  leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
                     What If Tution Payments{" "}
                     <span className="">
                         Where This Easy?

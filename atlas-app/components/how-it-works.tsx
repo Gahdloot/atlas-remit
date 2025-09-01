@@ -45,7 +45,7 @@ export function HowItWorks() {
               <span>How to use</span>
             </p>
 
-            <h2 className="text-4xl lg:text-5xl font-serif font-bold mb-4 bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
+            <h2 className="text-4xl lg:text-5xl font-work-sans-override font-semibold mb-4 bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
               How ATLAS works <br />
               <span>for tuition payments</span>
             </h2>
