@@ -1,52 +1,48 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { useRouter } from "next/navigation"
-import { useTrackPaymentMutation } from "@/store/api/schoolPaymentSlice"
-import Link from "next/link"
-import { Check, Download } from "lucide-react"
-import ProgressTracker from "@/components/progress-tracker"
-
-
+import { useState } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
+import { useTrackPaymentMutation } from "@/store/api/schoolPaymentSlice";
+import Link from "next/link";
+import { Check, Download } from "lucide-react";
+import ProgressTracker from "@/components/progress-tracker";
 
 export default function TrackPaymentPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [paymentID, setPaymentID] = useState("")
-  const [step, setStep] = useState("1") 
-  const [status, setStatus] = useState("") 
-  const [trackPayment, { isLoading, error }] = useTrackPaymentMutation()
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [paymentID, setPaymentID] = useState("");
+  const [step, setStep] = useState("1");
+  const [status, setStatus] = useState("");
+  const [trackPayment, { isLoading, error }] = useTrackPaymentMutation();
 
   const validateEmail = (email: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return regex.test(email)
-  }
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
   const handleContinue = async () => {
     if (!validateEmail(email) || !paymentID.trim()) {
-      alert("Please enter a valid email address and payment ID.")
-      return
+      alert("Please enter a valid email address and payment ID.");
+      return;
     }
 
     try {
-        const payload = {
-            email:email,
-            payment_reference:paymentID
-        }
-      const res = await trackPayment(payload).unwrap()
-      setStatus(res?.data?.data)
-      setStep("3") 
+      const payload = {
+        email: email,
+        payment_reference: paymentID,
+      };
+      const res = await trackPayment(payload).unwrap();
+      setStatus(res?.data?.data);
+      setStep("3");
     } catch (err) {
-      console.error("Failed to track payment:", err)
-      alert("Something went wrong. Please try again.")
+      console.error("Failed to track payment:", err);
+      alert("Something went wrong. Please try again.");
     }
-  }
-
-
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -76,7 +72,7 @@ export default function TrackPaymentPage() {
 
                 {/* Payment Progress */}
                 {/* <PaymentProgress currentStatus={paymentStatus} paymentId={paymentID} /> */}
-                <ProgressTracker status={status}/>
+                <ProgressTracker status={status} />
 
                 {/* Back Button */}
                 <div className="mt-8">
@@ -106,25 +102,28 @@ export default function TrackPaymentPage() {
                     {step == "1" ? (
                       <>
                         <div className="space-y-1 mb-6">
-                          <h1 className="text-white text-2xl sm:text-3xl  font-normal leading-tight">
-                            Hi there, <span className="text-lime-200">scholar!</span>
-                          </h1>
-                          <h2 className="text-white text-2xl sm:text-3xl font-normal">Track your tuition payment</h2>
+                          <h2 className="text-white text-2xl sm:text-3xl font-normal">
+                            <span className="text-lime-500 font-work-sans-override">
+                              Track
+                            </span>{" "}
+                            your tuition payment
+                          </h2>
                           <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
-                            Enter your email and payment ID to track your payment
+                            Enter your email and payment ID to track your
+                            payment
                           </p>
                         </div>
                       </>
                     ) : (
-                      <>
-                        
-                      </>
+                      <></>
                     )}
                   </CardHeader>
                   {step == "1" ? (
                     <CardContent className="space-y-6 px-4 sm:px-6">
                       <div className="space-y-3">
-                        <label className="text-gray-400 text-sm font-medium block text-left">Email</label>
+                        <label className="text-gray-400 text-sm font-medium block text-left">
+                          Email
+                        </label>
                         <Input
                           type="email"
                           placeholder="kunlearo3@gmail.com"
@@ -134,7 +133,7 @@ export default function TrackPaymentPage() {
                             border-2 
                             border-lime-400 
                             rounded-lg 
-                            text-white 
+                            text-gray-500 
                             placeholder:text-gray-500
                             h-12 
                             sm:h-14 
@@ -148,7 +147,9 @@ export default function TrackPaymentPage() {
                       </div>
 
                       <div className="space-y-3">
-                        <label className="text-gray-400 text-sm font-medium block text-left">Payment ID</label>
+                        <label className="text-gray-400 text-sm font-medium block text-left">
+                          Payment ID
+                        </label>
                         <Input
                           type="text"
                           placeholder="ATL20230909-923c"
@@ -159,7 +160,7 @@ export default function TrackPaymentPage() {
                             border-2 
                             border-lime-400 
                             rounded-lg 
-                            text-white 
+                            text-gray-500 
                             placeholder:text-gray-500
                             h-12 
                             sm:h-14 
@@ -189,7 +190,11 @@ export default function TrackPaymentPage() {
                               duration-200
                               cursor-pointer
                             "
-                          disabled={!validateEmail(email) || !paymentID.trim() || isLoading}
+                          disabled={
+                            !validateEmail(email) ||
+                            !paymentID.trim() ||
+                            isLoading
+                          }
                         >
                           {isLoading ? "Tracking..." : "Continue"}
                         </Button>
@@ -205,5 +210,5 @@ export default function TrackPaymentPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
