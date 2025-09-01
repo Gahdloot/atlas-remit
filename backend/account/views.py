@@ -1,20 +1,23 @@
+
 import base64
 import time
 import uuid
+import logging
 from django.core.files.base import ContentFile
 from django.utils import timezone
 from account.models.currency import Currency
 from rest_framework import generics
-from datetime import timedelta,datetime
+from datetime import timedelta, datetime
 import secrets
 import string
+
+logger = logging.getLogger(__name__)
 
 from account.models.payment_request import SchoolPaymentRequest, SchoolPaymentRequestInitializer
 from account.serializers import CurrencyWithRateSerializer, PaymentTackingSerializer, SchoolPaymentRequestSerializer
 from helpers.response import bad_request_response, success_response
 from helpers.upload_to_s3 import upload_base64_to_s3
 from helpers.email_helper import EmailHelper
-# Your existing view
 
 
 
@@ -26,44 +29,36 @@ class SchoolPaymentRequestCreateView(generics.GenericAPIView):
     permission_classes = []
 
     def post(self, request):
-        data = request.data.copy() 
-        key_to_upload = ['student_document', 'payer_id_document','payment_receipt']
-
-        for key in key_to_upload:
-            base64_data = data.get(key)
-            if base64_data and isinstance(base64_data, str) and base64_data.startswith("data:"):
-                try:
-                    file_url = self._handle_base64_upload(base64_data, key)
-                    data[key] = file_url  
-                except Exception as e:
-                    return bad_request_response(message=f"Failed to upload document")
-
-        
+        data = request.data.copy()
         payment_initializer = request.data.get('identifier')
-
         try:
             payment_initializer_object = SchoolPaymentRequestInitializer.objects.get(id=payment_initializer)
-        except:
+        except Exception as e:
+            logger.warning(f"Invalid payment initializer: {payment_initializer}. Error: {e}")
             return bad_request_response(message="Invalid request")
-        
+
         if payment_initializer_object.status == 'completed':
+            logger.info(f"Payment initializer {payment_initializer} already completed.")
             return bad_request_response(message="Invalid request")
 
         data['payment_initializer'] = payment_initializer
         serializer = self.get_serializer(data=data)
-        
-        serializer.is_valid(raise_exception=True)
-        payment_request = serializer.save()
-        payment_initializer_object.status = 'completed'
-        payment_initializer_object.save()
-
-        return success_response(
-            data={
-                'id': payment_request.id,
-                'email':payment_initializer_object.email,
-                'created_at': payment_request.created_at
-            }
-        )
+        try:
+            serializer.is_valid(raise_exception=True)
+            payment_request = serializer.save()
+            payment_initializer_object.status = 'completed'
+            payment_initializer_object.save()
+            logger.info(f"Payment request created successfully for initializer {payment_initializer}.")
+            return success_response(
+                data={
+                    'id': payment_request.id,
+                    'email': payment_initializer_object.email,
+                    'created_at': payment_request.created_at
+                }
+            )
+        except Exception as e:
+            logger.exception(f"Failed to create payment request for initializer {payment_initializer}.")
+            return bad_request_response(message="Failed to create payment request")
 
     def _handle_base64_upload(self, base64_string, file_prefix):
         """
@@ -89,20 +84,20 @@ class TractPaymentView(generics.GenericAPIView):
     def post(self, request):
         payment_reference = request.data.get('payment_reference')
         email = request.data.get('email')
-
         try:
             payment_request = SchoolPaymentRequest.objects.get(payment_id=payment_reference)
-        except:
+        except Exception as e:
+            logger.warning(f"Invalid payment reference: {payment_reference}. Error: {e}")
             return bad_request_response(message="Invalid ID provided")
-        
-        print(payment_request.payment_initializer.email)
+
         if payment_request.payment_initializer.email != email:
+            logger.warning(f"Email mismatch for payment reference {payment_reference}: {email} != {payment_request.payment_initializer.email}")
             return bad_request_response(message="Invalid ID provided")
 
-
+        logger.info(f"Payment status retrieved for reference {payment_reference}.")
         return success_response(
-            data={ 
-                'status':payment_request.processing_status
+            data={
+                'status': payment_request.processing_status
             }
         )
 
@@ -117,8 +112,9 @@ class WelcomeEmailView(generics.GenericAPIView):
 
     def post(self, request):
         email = request.data.get('email')
-        redirect_url = request.data.get('redirect_url','http://localhost:3000/payment')
+        redirect_url = request.data.get('redirect_url', 'http://localhost:3000/payment')
         if not email:
+            logger.warning("No email address provided for welcome email.")
             return bad_request_response(message="Email address is required")
 
         try:
@@ -133,13 +129,13 @@ class WelcomeEmailView(generics.GenericAPIView):
                 template_name="emails/welcome.html",
                 context=context
             )
-            print(str(initializer.id))
+            logger.info(f"Welcome email sent to {email} with initializer {initializer.id}")
             return success_response(
                 message="Welcome email sent successfully",
-                data={'email': email, 'sent_at': timezone.now(),'initializer':str(initializer.id)}
+                data={'email': email, 'sent_at': timezone.now(), 'initializer': str(initializer.id)}
             )
-
         except Exception as e:
+            logger.exception(f"Failed to send welcome email to {email}")
             return bad_request_response(message="Failed to send welcome email")
 
 
@@ -151,20 +147,20 @@ class ResendEmailView(generics.GenericAPIView):
 
     def post(self, request):
         email = request.data.get('email')
-        initializer = request.data.get('tinitializer') 
-        redirect_url = request.data.get('redirect_url','http://localhost:3000/payment')
-        
+        initializer = request.data.get('tinitializer')
+        redirect_url = request.data.get('redirect_url', 'http://localhost:3000/payment')
+
         if not email:
+            logger.warning("No email address provided for resend email.")
             return bad_request_response(message="Email address is required")
-        
-        try:
-            payment_initializer_object = SchoolPaymentRequestInitializer.objects.get(id=initializer)
-        except:
-            return bad_request_response(message="Invalid request")
-        
 
         try:
-            
+            payment_initializer_object = SchoolPaymentRequestInitializer.objects.get(id=initializer)
+        except Exception as e:
+            logger.warning(f"Invalid initializer for resend email: {initializer}. Error: {e}")
+            return bad_request_response(message="Invalid request")
+
+        try:
             context = {
                 "payment_link": f"{redirect_url}?initializer={str(payment_initializer_object.id)}",
                 "current_year": datetime.now().year
@@ -175,13 +171,13 @@ class ResendEmailView(generics.GenericAPIView):
                 template_name="emails/welcome.html",
                 context=context
             )
-
+            logger.info(f"Resent email to {email} for initializer {initializer}")
             return success_response(
                 message=f"Email resent successfully",
-                data={'email': email,'sent_at': timezone.now()}
+                data={'email': email, 'sent_at': timezone.now()}
             )
-
         except Exception as e:
+            logger.exception(f"Failed to resend email to {email} for initializer {initializer}")
             return bad_request_response(message="Failed to resend email")
 
 
@@ -194,27 +190,26 @@ class OneTimeVirtualAccountView(generics.GenericAPIView):
     def post(self, request):
         payment_request_id = request.data.get('payment_request_id')
         amount = request.data.get('amount')
-        
+
         if not payment_request_id or not amount:
+            logger.warning("Payment request ID and/or amount missing for virtual account generation.")
             return bad_request_response(message="Payment request ID and amount are required")
-        
 
         try:
             payment_request = SchoolPaymentRequest.objects.get(id=payment_request_id)
-        except:
-            return bad_request_response(
-                message=""
-            )
+        except Exception as e:
+            logger.warning(f"Invalid payment request ID for virtual account: {payment_request_id}. Error: {e}")
+            return bad_request_response(message="Invalid payment request ID")
 
         try:
             # Generate virtual account details
             virtual_account_number = self._generate_virtual_account()
             bank_name = "Virtual Bank"
             account_name = f"PAYMENT_{payment_request.student_first_name}"
-            
+
             # Set expiry time (24 hours from now)
             expires_at = timezone.now() + timedelta(hours=24)
-            
+
             # You might want to save this to your database
             virtual_account_data = {
                 'account_number': virtual_account_number,
@@ -226,12 +221,13 @@ class OneTimeVirtualAccountView(generics.GenericAPIView):
                 'status': 'active'
             }
 
+            logger.info(f"Virtual account generated for payment request {payment_request_id}")
             return success_response(
                 message="Virtual account generated successfully",
                 data=virtual_account_data
             )
-
         except Exception as e:
+            logger.exception(f"Failed to generate virtual account for payment request {payment_request_id}")
             return bad_request_response(message="Failed to generate virtual account")
 
     def _generate_virtual_account(self):
@@ -247,32 +243,30 @@ class PaymentVerificationView(generics.GenericAPIView):
 
     def post(self, request):
         payment_reference = request.data.get('payment_reference')
-        redirect_url = request.data.get('redirect_url','http://localhost:3000/track-payment')
+        redirect_url = request.data.get('redirect_url', 'http://localhost:3000/track-payment')
         transaction_id = request.data.get('transaction_id')
-        
+
         if not payment_reference and not transaction_id:
+            logger.warning("Payment reference or transaction ID missing for verification.")
             return bad_request_response(message="Payment reference or transaction ID is required")
-        
+
         try:
             payment_request = SchoolPaymentRequest.objects.get(id=payment_reference)
-        except:
-            return bad_request_response(
-                message=""
-            )
+        except Exception as e:
+            logger.warning(f"Invalid payment reference for verification: {payment_reference}. Error: {e}")
+            return bad_request_response(message="Invalid payment reference")
 
         try:
             # Simulate payment verification logic
             verification_result = self._verify_payment_with_provider(payment_reference, transaction_id)
-            
-            if verification_result['status'] == 'success':
-                
 
+            if verification_result['status'] == 'success':
                 # Update payment status in your database here
                 payment_request.processing_status = 'initiated'
                 payment_request.save()
 
                 context = {
-                    "user_name":f"{payment_request.payer_first_name} {payment_request.payer_first_name}",
+                    "user_name": f"{payment_request.payer_first_name} {payment_request.payer_first_name}",
                     "track_link": redirect_url,
                     "payment_id": payment_request.payment_id,
                     "current_year": datetime.now().year
@@ -284,6 +278,7 @@ class PaymentVerificationView(generics.GenericAPIView):
                     template_name="emails/track_payment.html",
                     context=context
                 )
+                logger.info(f"Payment verified and email sent for payment reference {payment_reference}")
                 return success_response(
                     message="Payment verified successfully",
                     data={
@@ -298,6 +293,7 @@ class PaymentVerificationView(generics.GenericAPIView):
                     }
                 )
             elif verification_result['status'] == 'pending':
+                logger.info(f"Payment is pending for payment reference {payment_reference}")
                 return success_response(
                     message="Payment is still pending",
                     data={
@@ -309,6 +305,7 @@ class PaymentVerificationView(generics.GenericAPIView):
                     }
                 )
             else:
+                logger.warning(f"Payment verification failed for payment reference {payment_reference}: {verification_result.get('reason', 'Unknown error')}")
                 return bad_request_response(
                     message="Payment verification failed",
                     data={
@@ -317,8 +314,8 @@ class PaymentVerificationView(generics.GenericAPIView):
                         'reason': verification_result.get('reason', 'Unknown error')
                     }
                 )
-
         except Exception as e:
+            logger.exception(f"Failed to verify payment for reference {payment_reference}")
             return bad_request_response(message="Failed to verify payment")
 
     def _verify_payment_with_provider(self, payment_reference, transaction_id):
@@ -354,17 +351,3 @@ class CurrencyRateListView(generics.GenericAPIView):
         serializer = CurrencyWithRateSerializer(queryset, many=True)
         return success_response(data=serializer.data)
     
-
-
-
-
-# context = {
-#     "payment_link": f"https://jsonformatter.org/",
-#     "current_year": datetime.now().year
-# }
-# EmailHelper.send_email_with_attachment(
-#     subject="Welcome to Atlas by Oneremit",
-#     to=['olakaycoder1@gmail.com'],
-#     template_name="emails/welcome.html",
-#     context=context
-# )
