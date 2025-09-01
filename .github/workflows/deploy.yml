@@ -33,13 +33,19 @@ jobs:
             echo "📥 Pulling latest changes from master..."
             git pull origin master
             
+            # Determine which docker compose command to use
+            
+            DOCKER_COMPOSE="docker compose"
+            
+            echo "Using: $DOCKER_COMPOSE"
+            
             # Stop containers
             echo "🛑 Stopping containers..."
-            docker-compose down
+            $DOCKER_COMPOSE down
             
             # Rebuild and start containers
             echo "🔨 Building and starting containers..."
-            docker-compose up -d --build
+            $DOCKER_COMPOSE up -d --build
             
             # Clean up unused Docker images
             echo "🧹 Cleaning up unused Docker images..."
@@ -51,7 +57,18 @@ jobs:
       - name: Verify deployment
         run: |
           ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+            cd /app/test_atlas
             echo "🔍 Verifying deployment..."
-            docker-compose ps
+            
+            # Use the same logic to determine docker compose command
+            if command -v docker-compose &> /dev/null; then
+              docker-compose ps
+            elif docker compose version &> /dev/null; then
+              docker compose ps
+            else
+              echo "❌ Docker compose not available for verification"
+              docker ps
+            fi
+            
             echo "📊 Deployment verification completed!"
           EOF
