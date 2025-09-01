@@ -1,8 +1,9 @@
 import { School } from "lucide-react"
+import Image from "next/image";
 
 interface StepIndicatorProps {
   currentStep: number
-  steps: { title: string; icon: React.ComponentType<any> }[]
+  steps: { title: string; icon: React.ComponentType<any>, IconImage:any }[]
 }
 
 
@@ -15,11 +16,13 @@ export function StepIndicator({ currentStep, steps }: StepIndicatorProps) {
         <div className="absolute top-4 left-12 right-12 h-0.5 bg-gray-200">
           <div
             className="h-full bg-lime-500 transition-all duration-300"
-            style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
+            style={{
+            width: `${Math.max(0, ((currentStep - 1) / (steps.length - 1)) * 100)}%`,
+          }}
           />
         </div>
 
-        {steps.map(({ title, icon: Icon }, index) => {
+        {steps.map(({ title, icon: Icon, IconImage }, index) => {
           const stepNumber = index + 0
           const isCompleted = stepNumber < currentStep
           const isCurrent = stepNumber === currentStep
@@ -35,7 +38,12 @@ export function StepIndicator({ currentStep, steps }: StepIndicatorProps) {
                     isActive ? "bg-lime-500 text-white" : "bg-gray-300 text-gray-600"
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Image 
+                  src={IconImage} 
+                  height={10} 
+                  width={10}
+                  alt={'icons'} 
+                  className="w-4 h-4" />
                 </div>
               </div>
               {/* <span

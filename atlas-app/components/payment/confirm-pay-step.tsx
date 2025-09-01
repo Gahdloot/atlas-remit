@@ -13,6 +13,7 @@ import {
 } from "@/store/api/schoolPaymentSlice"
 import { toast } from "sonner" 
 import type { VirtualAccount } from "@/types/payment"
+import Image from "next/image"
 
 interface ConfirmPayStepProps {
   paymentData: PaymentData
@@ -99,7 +100,13 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
               disabled={isProcessing}
               className="flex-1 w-full py-6 md:flex-none bg-white text-base font-bold text-gray-600 hover:text-gray-900 cursor-pointer disabled:opacity-50"
             >
-              <PenLine />
+              <Image 
+              src="/images/home-section/edit-04.png"
+              height={10}
+              width={10}
+              alt="pay"
+              className="w-5 h-5"
+              />
               <span>Edit details</span>
             </Button>
             
@@ -115,7 +122,14 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
                 </>
               ) : (
                 <>
-                  <PenLine />
+                  {/* <PenLine /> */}
+                  <Image 
+                  src="/images/home-section/invoice-03.png"
+                  height={10}
+                  width={10}
+                  alt="pay"
+                  className="w-5 h-5"
+                  />
                   <span>Pay now</span>
                 </>
               )}

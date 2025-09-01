@@ -6,9 +6,11 @@ import { Menu, X, ChevronDown } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter()
 
   return (
     <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-7xl mx-auto px-4">
@@ -28,13 +30,13 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-white hover:text-lime-400 transition-colors">
+            <Link href="/" className="text-white font-medium text-sm hover:text-lime-400 transition-colors">
               Home
             </Link>
-            <Link href="/about" className="text-white hover:text-lime-400 transition-colors">
+            <Link href="/about" className="text-white font-medium text-sm hover:text-lime-400 transition-colors">
               About
             </Link>
-            <a href="#" className="text-white hover:text-lime-400 transition-colors">
+            <a href="#" className="text-white font-medium text-sm hover:text-lime-400 transition-colors">
               How it works
             </a>
 
@@ -80,9 +82,9 @@ export function Navbar() {
             </DropdownMenu>
 
             <div className="hidden md:block">
-                <Link href='/track-payment' className="bg-lime-400 text-black hover:bg-lime-500 font-medium rounded-full px-6">
+                <button onClick={()=> router.push("/track-payment")} className="text-lime-400 border text-sm border-lime-400 p-2 px-4 g-transparent font-medium rounded-full ">
                 Track Payment
-                </Link>
+                </button>
             </div>
           </div>
 
@@ -122,9 +124,9 @@ export function Navbar() {
               <a href="#" className="text-white hover:text-lime-400 transition-colors py-2">
                 Support
               </a>
-              <Link href='/track-payment' className="bg-lime-400 text-black hover:bg-lime-500 font-medium rounded-full mt-4">
+              <Button onClick={()=> router.push("/track-payment")}  className="text-white border  hover:bg-lime-500 font-medium rounded-full mt-4">
                 Track Payment
-              </Link>
+              </Button>
             </div>
           </div>
         )}

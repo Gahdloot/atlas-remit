@@ -19,10 +19,10 @@ export default function PaymentPage() {
   const [paymentData, setPaymentData] = useState<PaymentData>(defaultPaymentData)
 
   const steps = [
-      { component: PaymentDetailsStep, title: "Payment details", icon: CreditCard },
-      { component: UniversityStep, title: "University", icon: School },
-      { component: AmountAndRateStep, title: "Amount and Rate", icon: Home },
-      { component: ConfirmPayStep, title: "Confirm and pay", icon: CheckCircle },
+      { component: PaymentDetailsStep, title: "Payment details", icon: CreditCard , IconImage: "/images/home-section/user.png"},
+      { component: UniversityStep, title: "University", icon: School, IconImage: "/images/home-section/school.png" },
+      { component: AmountAndRateStep, title: "Amount and Rate", icon: Home, IconImage: "/images/home-section/arrow-reload-horizontal.png" },
+      { component: ConfirmPayStep, title: "Confirm and pay", icon: CheckCircle, IconImage: "/images/home-section/invoice-03.png" },
     ]
 
 
@@ -80,9 +80,9 @@ export default function PaymentPage() {
                   </span>
                 </h1>
                 <p className="text-lg text-muted-foreground">
-                  Send faster, smarter and safer. Oneremit has
+                  Send faster, smarter and safer. <span className=" text-white">ATLAS has</span>
                   <br />
-                  got you covered.
+                  <span className=" text-white">got you covered.</span>
                 </p>
               </div>
             </div>
@@ -92,14 +92,14 @@ export default function PaymentPage() {
 
       {/* Right Side */}
       <div
-        className={`w-full lg:w-2/3 bg-[#eeebeb] flex flex-col`}
+        className={`w-full lg:w-2/3 bg-[#f8f8f8] flex flex-col`}
       >
         {/* Step Indicator */}
         {(
           <div className="md:p-8 border-b border-gray-100 w-full lg:w-2/3 md:mx-auto">
             <StepIndicator
             currentStep={currentStep}
-            steps={steps.slice(0).map(({ title, icon }) => ({ title, icon }))}
+            steps={steps.slice(0).map(({ title, icon , IconImage}) => ({ title, icon, IconImage }))}
           />
 
           </div>

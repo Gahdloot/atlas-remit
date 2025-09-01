@@ -54,7 +54,7 @@ export function PaymentDetailsStep({
 
   return (
     <div className="min-h-screen  p-4 ">
-      <div className="">
+      <div className=" ">
         <StepTitleDescription 
           titleNormal={"Payment"} 
           titleGradient={"Information"} 

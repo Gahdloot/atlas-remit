@@ -59,7 +59,7 @@ export function HowItWorks() {
         <div className="w-full md:max-w-4xl  mx-auto px-6 py-16  text-white ">
 
           <div className="flex flex-col items-center justify-center text-center mb-16">
-            <p className="flex items-center gap-3 text-sm text-lime-100 bg-primary/20 px-4 py-2 rounded-full w-fit shadow-lime-50 shadow mb-4">
+            <p className="flex items-center gap-3 text-sm text-lime-100 bg-[#01120b] px-4 py-2 rounded-full w-fit shadow-lime-50 shadow mb-4">
               <GraduationCap className="w-4 h-4" />
               <span>How to use</span>
             </p>
