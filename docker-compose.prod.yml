@@ -19,7 +19,7 @@ services:
       context: ./atlas-app
     container_name: atlas-frontend
     environment:
-      - NEXT_PUBLIC_API_URL=http://159.65.165.21/:8000/api/v1
+      - NEXT_PUBLIC_API_URL=http://159.65.165.21:8000/api/v1
     ports:
       - "3000:3000"
     depends_on:
