@@ -98,7 +98,7 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
               onClick={prevStep}
               variant="ghost"
               disabled={isProcessing}
-              className="flex-1 w-full py-6 md:flex-none bg-white text-base font-bold text-gray-600 hover:text-gray-900 cursor-pointer disabled:opacity-50"
+              className="flex-1 w-full font-medium py-6 md:flex-none bg-white text-base  text-gray-600 hover:text-gray-900 cursor-pointer disabled:opacity-50"
             >
               <Image 
               src="/images/home-section/edit-04.png"
@@ -113,7 +113,7 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
             <Button
               onClick={handlePayNow}
               disabled={isProcessing}
-              className="flex-1 md:flex-none px-8 w-full py-6 cursor-pointer text-base font-bold bg-lime-500 hover:bg-lime-600 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 md:flex-none px-8 w-full py-6 cursor-pointer text-base font-medium  bg-lime-500 hover:bg-lime-600 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isProcessing ? (
                 <>

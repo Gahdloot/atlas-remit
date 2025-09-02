@@ -209,14 +209,14 @@ export function AmountAndRateStep({
               <Button
                 onClick={prevStep}
                 variant="ghost"
-                className="flex-1 w-full py-6 md:flex-none bg-white text-base font-bold text-gray-600 hover:text-gray-900 cursor-pointer"
+                className="flex-1 w-full py-6 md:flex-none bg-white text-base font-medium text-gray-600 hover:text-gray-900 cursor-pointer"
               >
                 Go back
               </Button>
               <Button
                 onClick={handleNext}
                 className={cn(
-                  "flex-1 md:flex-none px-8 w-full py-6 cursor-pointer text-base font-bold",
+                  "flex-1 md:flex-none px-8 w-full py-6 cursor-pointer text-base font-medium",
                   isFormValid
                     ? "bg-lime-500 hover:bg-lime-600 text-white"
                     : "bg-gray-300 text-gray-400 cursor-not-allowed"
