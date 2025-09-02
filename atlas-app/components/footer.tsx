@@ -26,7 +26,7 @@ export default function Footer() {
               <p className="text-gray-400 text-sm mb-6 mt-2">
                 Fast transfers. Lower fees. Total security. ATLAS by Oneremit makes paying tuition abroad easy.
               </p>
-              <div className="flex items-center space-x-3">
+              {/* <div className="flex items-center space-x-3">
                 <span className="text-gray-400 text-sm">Partnered with:</span>
                 <Image 
                     src={'/images/maple-education-canada.png'}
@@ -36,7 +36,7 @@ export default function Footer() {
                     className=" "
                     priority
                 />
-              </div>
+              </div> */}
             </div>
 
             {/* Features */}
@@ -131,7 +131,7 @@ export default function Footer() {
       </footer>
 
       {/* Bottom Banner */}
-      <div className="bg-gray-900 py-8 text-center">
+      <div className="py-8 text-center">
         <Image
             src="/images/footer-banner.png"
             alt="Turning Miles Into Seconds for Tuition Payments"

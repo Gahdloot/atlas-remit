@@ -1,4 +1,5 @@
 "use client"
+import { FAQSection } from "@/components/faq-section";
 import Footer from "@/components/footer";
 import { HeroSection } from "@/components/hero-section"
 import { HowItWorks } from "@/components/how-it-works"
@@ -11,6 +12,10 @@ export default function HomePage() {
       <Navbar />
       <HeroSection />
       <HowItWorks />
+      {/* add the update here */}
+      {/* <FeaturesSection />
+      <ResourcesSection /> */}
+      <FAQSection />
       <Footer />
     </main>
   )

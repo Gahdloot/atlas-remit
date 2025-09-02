@@ -6,7 +6,7 @@ import Image from "next/image"
 import Link from "next/link"
 
 interface PaymentSuccessStepProps {
-  email?: string
+  email?: string| null|undefined
   onTrackPayment?: () => void
 }
 

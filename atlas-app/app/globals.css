@@ -7,7 +7,9 @@
   -webkit-appearance: none;
   appearance: none;
 }
-
+.font-work-sans-override {
+  font-family: var(--font-work-sans) !important;
+}
 :root {
   /* Updated color tokens for ATLAS dark theme with bright green accents */
   --background: oklch(0.05 0 0); /* Very dark background */
@@ -43,8 +45,9 @@
   --sidebar-accent-foreground: oklch(0.05 0 0);
   --sidebar-border: oklch(0.25 0 0);
   --sidebar-ring: oklch(0.75 0.2 120);
-  --font-manrope: "Manrope", sans-serif;
-  --font-geist: "Geist", serif;
+  /* Updated font variables */
+  --font-work-sans: "Work Sans", sans-serif;
+  --font-poppins: "Poppins", sans-serif;
 }
 
 .dark {
@@ -81,14 +84,15 @@
   --sidebar-accent-foreground: oklch(0.05 0 0);
   --sidebar-border: oklch(0.25 0 0);
   --sidebar-ring: oklch(0.75 0.2 120);
-  --font-manrope: "Manrope", sans-serif;
-  --font-geist: "Geist", serif;
+  /* Updated font variables for dark mode */
+  --font-work-sans: "Work Sans", sans-serif;
+  --font-poppins: "Poppins", sans-serif;
 }
 
 @theme inline {
-  /* Updated font configuration for Geist and Manrope */
-  --font-sans: var(--font-manrope);
-  --font-serif: var(--font-geist);
+  /* Updated font configuration - Poppins as default sans, Work Sans for headers */
+  --font-sans: var(--font-poppins);
+  --font-serif: var(--font-work-sans); /* Using serif variable for Work Sans */
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);

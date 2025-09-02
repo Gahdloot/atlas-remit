@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Confirmation - Atlas by Oneremit</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f8f9fa;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px 30px;">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <div style="font-size: 48px; font-weight: bold; color: #84cc16; margin-bottom: 8px; letter-spacing: -1px;">
+                ⛰️atlas
+            </div>
+            <div style="font-size: 14px; color: #6b7280; font-weight: 500;">
+                By Oneremit
+            </div>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <h1 style="font-size: 24px; font-weight: 600; color: #111827; margin: 0; line-height: 1.3;">
+                Hello {{ user_name }},
+            </h1>
+        </div>
+
+        <!-- Main Message -->
+        <div style="margin-bottom: 40px;">
+            <p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 0;">
+                Your tuition payment has been completed. Your receipt has been attached to this email.
+            </p>
+        </div>
+
+        <div style="margin-bottom: 40px;">
+            <h2 style="font-size: 18px; font-weight: 600; color: #111827; margin: 0 0 16px 0;">
+                Security
+            </h2>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 24px; vertical-align: top; padding-right: 8px;">
+                        <span style="font-size: 16px;">🔒</span>
+                    </td>
+                    <td style="vertical-align: top;">
+                        <p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 0;">
+                            If you didn't request this, ignore this email.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div style="margin-bottom: 40px;">
+            <h2 style="font-size: 18px; font-weight: 600; color: #111827; margin: 0 0 16px 0;">
+                Need any help?
+            </h2>
+            <p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 0;">
+                Email <a href="mailto:support@oneremit.co" style="color: #3b82f6; text-decoration: none;">support@oneremit.co</a>
+            </p>
+        </div>
+
+        {% if receipt_filename %}
+        <div style="background-color: #f3f4f6; border-radius: 8px; padding: 20px; margin-bottom: 30px;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="width: 60px; vertical-align: top; padding-right: 12px;">
+                        <div style="background-color: #dc2626; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; text-align: center; display: inline-block;">
+                            PDF
+                        </div>
+                    </td>
+                    <td style="vertical-align: top;">
+                        <div style="font-size: 14px; font-weight: 500; color: #111827; margin-bottom: 2px;">
+                            {{ receipt_filename }}
+                        </div>
+                        <div style="font-size: 12px; color: #6b7280;">
+                            PDF
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        {% endif %}
+
+        <div style="border-top: 1px solid #e5e7eb; padding-top: 30px; text-align: center;">
+            <p style="font-size: 14px; color: #6b7280; margin: 0; line-height: 1.5;">
+                This email was sent by Atlas by Oneremit<br>
+                © {{ current_year }} Oneremit. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
