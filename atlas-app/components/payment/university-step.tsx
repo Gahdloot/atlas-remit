@@ -1,10 +1,16 @@
 "use client";
 
 import { GraduationCap, Search, X, ChevronDown } from "lucide-react";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { StepTitleDescription } from "./step-title-description";
 import { InputWithLabel } from "../ui/input-with-label";
@@ -12,6 +18,7 @@ import { PaymentData } from "@/types/payment";
 import universityList from "@/constants/uni.json";
 import debounce from "lodash.debounce";
 import Image from "next/image";
+import { VirtualizedList } from "./virtualized-list";
 
 interface UniversityStepProps {
   paymentData: PaymentData;
@@ -21,7 +28,11 @@ interface UniversityStepProps {
   currentStep: number;
 }
 
-const universities = universityList.map((u) => u.name);
+const universities = universityList.map((u) => ({
+  name: u.name,
+  country: u.country,
+  fullDisplay: `(${u.country}) ${u.name}`, 
+}));
 
 export function UniversityStep({
   paymentData,
@@ -32,30 +43,99 @@ export function UniversityStep({
 }: UniversityStepProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUniversity, setSelectedUniversity] = useState(paymentData.studentInstitution || "");
+  const [selectedUniversity, setSelectedUniversity] = useState(
+    paymentData.studentInstitution || ""
+  );
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  ` `;
+  const [inputValue, setInputValue] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const debouncedSetSearchTerm = useCallback(
-    debounce((value: string) => {
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+
+    if (value.length < 2) {
       setSearchTerm(value);
-    }, 300),
-    []
-  );
+      setIsSearching(false);
+      return;
+    }
 
-  const filteredUniversities = universities.filter((university) =>
-    university.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    setIsSearching(true);
+    setTimeout(() => {
+      setSearchTerm(value);
+      setIsSearching(false);
+    }, 50);
+  };
 
-  const handleSelect = (university: string) => {
-    setSelectedUniversity(university);
-    updatePaymentData({ studentInstitution: university });
+const commonSearches = useMemo(() => {
+  const common = ["University", "College", "Institute", "School", "Tech"];
+  const cache = new Map();
+
+  common.forEach((term) => {
+    const lowerTerm = term.toLowerCase();
+    const results = universities
+      .filter((u) => u.name.toLowerCase().includes(lowerTerm)) 
+      .slice(0, 20);
+    cache.set(term, results);
+  });
+
+  return cache;
+}, [universities]);
+
+  const filteredUniversities = useMemo(() => {
+    if (!searchTerm.trim() || searchTerm.length < 2) return [];
+
+    const lowerSearchTerm = searchTerm.toLowerCase();
+
+    const exactMatches = [];
+    const startsWithMatches = [];
+    const containsMatches = [];
+
+    for (let i = 0; i < universities.length; i++) {
+      const university = universities[i];
+      const lowerUniversityName = university.name.toLowerCase();
+      const lowerUniversityFull = university.fullDisplay.toLowerCase();
+
+      if (
+        lowerUniversityName === lowerSearchTerm ||
+        lowerUniversityFull === lowerSearchTerm
+      ) {
+        exactMatches.push(university);
+      } else if (
+        lowerUniversityName.startsWith(lowerSearchTerm) ||
+        lowerUniversityFull.startsWith(lowerSearchTerm)
+      ) {
+        startsWithMatches.push(university);
+      } else if (
+        lowerUniversityName.includes(lowerSearchTerm) ||
+        lowerUniversityFull.includes(lowerSearchTerm)
+      ) {
+        containsMatches.push(university);
+      }
+    }
+
+    return [...exactMatches, ...startsWithMatches, ...containsMatches];
+  }, [searchTerm]);
+
+  const handleSelect = (universityName: string) => {
+    setSelectedUniversity(universityName);
+    updatePaymentData({ studentInstitution: universityName });
     setIsOpen(false);
     setSearchTerm("");
+    setInputValue("");
   };
 
   const handleClear = () => {
     setSelectedUniversity("");
     setSearchTerm("");
+    setInputValue("");
     updatePaymentData({ studentInstitution: "" });
   };
 
@@ -72,7 +152,8 @@ export function UniversityStep({
     } else if (digits.length <= 4) {
       formatted = digits.slice(0, 2) + "-" + digits.slice(2);
     } else {
-      formatted = digits.slice(0, 2) + "-" + digits.slice(2, 4) + "-" + digits.slice(4);
+      formatted =
+        digits.slice(0, 2) + "-" + digits.slice(2, 4) + "-" + digits.slice(4);
     }
     return formatted;
   };
@@ -88,7 +169,8 @@ export function UniversityStep({
     const age = today.getFullYear() - birthDate.getFullYear();
     const hasHadBirthdayThisYear =
       today.getMonth() > birthDate.getMonth() ||
-      (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+      (today.getMonth() === birthDate.getMonth() &&
+        today.getDate() >= birthDate.getDate());
 
     const actualAge = hasHadBirthdayThisYear ? age : age - 1;
     return actualAge >= 15;
@@ -115,8 +197,13 @@ export function UniversityStep({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
+        setInputValue("");
+        setSearchTerm("");
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -131,37 +218,63 @@ export function UniversityStep({
         <StepTitleDescription
           titleNormal={"Institution"}
           titleGradient={"Information"}
-          descriptions={["Please select your university to continue.", "ATLAS supports schools in Canada and the UK for now."]}
+          descriptions={[
+            "Please select your university to continue.",
+            "ATLAS supports schools in Canada and the UK for now.",
+          ]}
         />
 
         <div className="space-y-2 mt-4">
-          <label className="text-sm font-medium text-[#939b98]">Choose University</label>
+          <label className="text-gray-600 mb-2 text-sm font-medium text-base font-medium">
+            Choose University
+          </label>
           <div className="relative mt-2">
             <button
               onClick={() => setIsOpen(!isOpen)}
               className={cn(
                 "w-full flex items-center gap-3 p-4 border-1 transition-colors rounded-3xl cursor-pointer",
                 isOpen ? "border-lime-400 bg-lime-50/60" : "border-white",
-                selectedUniversity ? "bg-lime-50/60 border-lime-400" : "bg-white"
+                selectedUniversity
+                  ? "bg-lime-50/60 border-lime-400"
+                  : "bg-white"
               )}
             >
               <div className="w-16 h-16 bg-lime-100 rounded-full flex items-center justify-center">
                 <div className="w-8 h-8 bg-lime-400 rounded-full flex items-center justify-center">
-                  <Image 
-                    src={'/images/home-section/school.png'}
+                  <Image
+                    src={"/images/home-section/school.png"}
                     height={10}
                     width={10}
                     alt="school icons"
-                    className="w-5 h-5 text-black" />
+                    className="w-5 h-5 text-black"
+                  />
                 </div>
               </div>
               <div className="flex-1 text-left">
                 {selectedUniversity ? (
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-2">
-                      <div className="text-sm font-medium text-gray-900">University</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        University
+                      </div>
                       <div className="text-xs text-gray-600 flex items-center justify-between space-x-16 bg-white border-[1px] border-gray-50 rounded-xl p-1 px-3">
-                        <p>{selectedUniversity}</p>
+                        <p>
+                          {selectedUniversity &&
+                            universities.find(
+                              (u) => u.name === selectedUniversity
+                            )?.country && (
+                              <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2 py-1 rounded mr-2">
+                                (
+                                {
+                                  universities.find(
+                                    (u) => u.name === selectedUniversity
+                                  )?.country
+                                }
+                                )
+                              </span>
+                            )}
+                          {selectedUniversity}
+                        </p>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -176,13 +289,22 @@ export function UniversityStep({
                   </div>
                 ) : (
                   <div>
-                    <div className="text-sm font-medium text-gray-900">University</div>
-                    <div className="text-sm text-gray-500">Select a university</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      University
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Select a university
+                    </div>
                   </div>
                 )}
               </div>
               {!selectedUniversity && (
-                <ChevronDown className={cn("w-5 h-5 text-gray-400 transition-transform", isOpen && "rotate-180")} />
+                <ChevronDown
+                  className={cn(
+                    "w-5 h-5 text-gray-400 transition-transform",
+                    isOpen && "rotate-180"
+                  )}
+                />
               )}
             </button>
 
@@ -197,41 +319,71 @@ export function UniversityStep({
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <Input
-                      placeholder="Search University"
-                      value={searchTerm}
-                      onChange={(e) => debouncedSetSearchTerm(e.target.value)}
+                      ref={inputRef}
+                      placeholder="Search (min. 2 characters)"
+                      value={inputValue}
+                      onChange={handleInputChange}
                       className="pl-10 border-gray-200 border-[2px] focus:ring-[1px] focus:border-gray-300 focus-visible:border-gray-200 focus:ring-gray-200 text-gray-400 rounded-3xl h-12"
                       aria-label="Search universities"
                     />
                   </div>
                 </div>
-                <div className="max-h-60 overflow-y-auto">
-                  {filteredUniversities.map((university) => (
-                    <button
-                      key={university}
-                      onClick={() => handleSelect(university)}
-                      role="option"
-                      aria-selected={selectedUniversity === university}
-                      className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 text-left transition-colors"
-                    >
-                      <div className="flex-shrink-0 w-6 h-6 bg-gray-100 rounded flex items-center justify-center">
-                        <Image 
-                        src={'/images/home-section/school.png'}
-                        height={10}
-                        width={10}
-                        alt="school icons"
-                        className="w-3 h-3 text-black" />
-                      </div>
-                      <div className="flex-1">
-                        <span className="text-sm text-gray-900">
-                          {university.split(" ").slice(0, -1).join(" ")}{" "}
-                          <span className="text-blue-500">University</span>
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-                  {filteredUniversities.length === 0 && (
-                    <div className="p-4 text-center text-sm text-gray-500">No universities found</div>
+                <div className="max-h-60">
+                  {filteredUniversities.length > 0 ? (
+                    <VirtualizedList
+                      items={filteredUniversities}
+                      itemHeight={48}
+                      visibleHeight={240}
+           
+                      renderItem={(university, index) => (
+                        <button
+                          key={`${university.name}-${index}`}
+                          onClick={() => handleSelect(university.name)}
+                          role="option"
+                          aria-selected={selectedUniversity === university.name}
+                          className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 text-left transition-colors"
+                        >
+                          <div className="flex-shrink-0 w-6 h-6 rounded flex items-center justify-center">
+                            <Image
+                              src={"/images/home-section/school.png"}
+                              height={30}
+                              width={30}
+                              alt="school icons"
+                              className="w-6 h-6 text-black"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <span className="text-sm text-gray-900">
+                     
+                              <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2 py-1 rounded mr-2">
+                                {university.country}
+                              </span>
+                              {university.name
+                                .split(new RegExp(`(${searchTerm})`, "gi"))
+                                .map((part, index) =>
+                                  part.toLowerCase() ===
+                                  searchTerm.toLowerCase() ? (
+                                    <span
+                                      key={index}
+                                      className="text-blue-500 font-medium"
+                                    >
+                                      {part}
+                                    </span>
+                                  ) : (
+                                    part
+                                  )
+                                )}
+                            </span>
+                          </div>
+                        </button>
+                      )}
+                    />
+                  ) : (
+                    <div className="p-4 text-center text-sm text-gray-500">
+                      {searchTerm
+                        ? "No universities found"
+                        : "Start typing to search universities"}
+                    </div>
                   )}
                 </div>
               </div>
@@ -242,10 +394,14 @@ export function UniversityStep({
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2 w-full">
-              <label className="text-sm font-medium text-[#939b98]">Expected Year of Completion</label>
+              <label className="text-sm font-medium text-[#939b98]">
+                Expected Year of Completion
+              </label>
               <Select
                 value={paymentData.studentExpectedYearOfCompletion}
-                onValueChange={(value) => updatePaymentData({ studentExpectedYearOfCompletion: value })}
+                onValueChange={(value) =>
+                  updatePaymentData({ studentExpectedYearOfCompletion: value })
+                }
               >
                 <SelectTrigger className="border-gray-200 py-4 lg:py-6 text-sm lg:text-base w-full">
                   <SelectValue placeholder="" />
@@ -253,16 +409,24 @@ export function UniversityStep({
                 <SelectContent>
                   {Array.from({ length: 7 }).map((_, i) => {
                     const year = 2025 + i;
-                    return <SelectItem key={year} value={year.toString()}>{year}</SelectItem>;
+                    return (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    );
                   })}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2 w-full">
-              <label className="text-sm font-medium text-[#939b98]">Program Studied</label>
+              <label className="text-sm font-medium text-[#939b98]">
+                Program Studied
+              </label>
               <Select
                 value={paymentData.studentProgramStudied}
-                onValueChange={(value) => updatePaymentData({ studentProgramStudied: value })}
+                onValueChange={(value) =>
+                  updatePaymentData({ studentProgramStudied: value })
+                }
               >
                 <SelectTrigger className="border-gray-200 py-4 lg:py-6 text-sm lg:text-base w-full">
                   <SelectValue placeholder="" />
@@ -276,20 +440,30 @@ export function UniversityStep({
             </div>
           </div>
           <div className="space-y-2 w-full">
-            <label className="text-sm font-medium text-[#939b98]">Payment Type</label>
+            <label className="text-sm font-medium text-[#939b98]">
+              Payment Type
+            </label>
             <Select
               value={paymentData.paymentType}
-              onValueChange={(value) => updatePaymentData({ paymentType: value })}
+              onValueChange={(value) =>
+                updatePaymentData({ paymentType: value })
+              }
             >
               <SelectTrigger className="border-gray-200 py-4 lg:py-6 text-sm lg:text-base w-full">
                 <SelectValue placeholder="" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Application Fee">Application Fee</SelectItem>
-                <SelectItem value="Registration Deposit">Registration Deposit</SelectItem>
+                <SelectItem value="Registration Deposit">
+                  Registration Deposit
+                </SelectItem>
                 <SelectItem value="Tution Fee">Tuition Fee</SelectItem>
-                <SelectItem value="Resident and Meal Plan">Resident and Meal Plan</SelectItem>
-                <SelectItem value="German Blocked Account">German Blocked Account</SelectItem>
+                <SelectItem value="Resident and Meal Plan">
+                  Resident and Meal Plan
+                </SelectItem>
+                <SelectItem value="German Blocked Account">
+                  German Blocked Account
+                </SelectItem>
                 <SelectItem value="Other">Other</SelectItem>
               </SelectContent>
             </Select>
@@ -299,17 +473,22 @@ export function UniversityStep({
               label="Student's personal email"
               value={paymentData.studentPersonalEmail}
               inputClassName={`bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10 ${
-                paymentData.studentPersonalEmail && !isValidEmail(paymentData.studentPersonalEmail)
+                paymentData.studentPersonalEmail &&
+                !isValidEmail(paymentData.studentPersonalEmail)
                   ? "border-red-500 focus:border-red-500"
                   : ""
               }`}
-              onChange={(e) => updatePaymentData({ studentPersonalEmail: e.target.value })}
+              onChange={(e) =>
+                updatePaymentData({ studentPersonalEmail: e.target.value })
+              }
             />
             <InputWithLabel
               label="Student's mobile number"
               value={paymentData.studentPhoneNumber}
               inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
-              onChange={(e) => updatePaymentData({ studentPhoneNumber: e.target.value })}
+              onChange={(e) =>
+                updatePaymentData({ studentPhoneNumber: e.target.value })
+              }
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -317,13 +496,17 @@ export function UniversityStep({
               label="Student's first name"
               value={paymentData.studentFirstName}
               inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
-              onChange={(e) => updatePaymentData({ studentFirstName: e.target.value })}
+              onChange={(e) =>
+                updatePaymentData({ studentFirstName: e.target.value })
+              }
             />
             <InputWithLabel
               label="Student's last name"
               value={paymentData.studentLastName}
               inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
-              onChange={(e) => updatePaymentData({ studentLastName: e.target.value })}
+              onChange={(e) =>
+                updatePaymentData({ studentLastName: e.target.value })
+              }
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -333,7 +516,8 @@ export function UniversityStep({
               placeholder=""
               value={paymentData.studentDateOfBirth}
               inputClassName={`bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10 ${
-                paymentData.studentDateOfBirth && !isValidDateOfBirth(paymentData.studentDateOfBirth)
+                paymentData.studentDateOfBirth &&
+                !isValidDateOfBirth(paymentData.studentDateOfBirth)
                   ? "border-red-500 focus:border-red-500"
                   : ""
               }`}
@@ -347,11 +531,14 @@ export function UniversityStep({
               type="email"
               value={paymentData.studentEmail}
               inputClassName={`bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10 ${
-                paymentData.studentEmail && !isValidEmail(paymentData.studentEmail)
+                paymentData.studentEmail &&
+                !isValidEmail(paymentData.studentEmail)
                   ? "border-red-500 focus:border-red-500"
                   : ""
               }`}
-              onChange={(e) => updatePaymentData({ studentEmail: e.target.value })}
+              onChange={(e) =>
+                updatePaymentData({ studentEmail: e.target.value })
+              }
             />
           </div>
         </div>
@@ -367,7 +554,7 @@ export function UniversityStep({
           <Button
             onClick={handleNext}
             className={cn(
-              "flex-1 md:flex-none px-8 w-full py-6 cursor-pointer text-base font-medium",
+              "flex-1 md:flex-none px-8 w-full py-6 cursor-pointer text-base font-bold",
               isFormValid
                 ? "bg-lime-500 hover:bg-lime-600 text-white"
                 : "bg-gray-300 text-gray-400 cursor-not-allowed"
