@@ -7,11 +7,7 @@ import { Button } from "@/components/ui/button"
 import { StepTitleDescription } from "./step-title-description"
 import { PaymentData } from "@/types/payment"
 import { useGetCurrenciesWithRatesQuery } from "@/store/api/schoolPaymentSlice"
-import { ReactComponent as Bank } from '../../public/svgs/bank.svg';
 
-function MyComponent() {
-  return <Bank />;
-}
 
 interface PaymentDetailsStepProps {
   paymentData: PaymentData
