@@ -7,6 +7,11 @@ import { Button } from "@/components/ui/button"
 import { StepTitleDescription } from "./step-title-description"
 import { PaymentData } from "@/types/payment"
 import { useGetCurrenciesWithRatesQuery } from "@/store/api/schoolPaymentSlice"
+import { ReactComponent as Bank } from '../../public/svgs/bank.svg';
+
+function MyComponent() {
+  return <Bank />;
+}
 
 interface PaymentDetailsStepProps {
   paymentData: PaymentData
@@ -71,7 +76,7 @@ export function AmountAndRateStep({
         titleGradient="rate"
         descriptions={["Enter details about the amount to be paid"]}
       />
-      <div className="text-[#939b98] bg-gray-50 rounded-2xl p-4 min-h-[280px] relative">
+      <div className="text-[#939b98] bg-white rounded-2xl p-4 min-h-[280px] relative">
         {isLoading ? (
           <div className="flex justify-center items-center h-full">
             <svg
@@ -105,7 +110,7 @@ export function AmountAndRateStep({
             <div className="flex items-center justify-between mb-8 pt-4">
               <div className="flex items-center gap-2">
                 <div className="flex">
-                  <span className="text-2xl">🇳🇬</span>
+                  <span className="text-2xl rounded-full">🇳🇬</span>
                   <span className="text-2xl">{selectedCurrencyData?.flag || "💱"}</span>
                 </div>
                 <span className="text-xl font-semibold">NGN/{selectedCurrency}</span>

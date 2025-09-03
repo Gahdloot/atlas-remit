@@ -87,6 +87,7 @@ export function PaymentDetailsStep({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="Student">Student</SelectItem>
+                <SelectItem value="Agent">Agent</SelectItem>
                 <SelectItem value="Parent">Parent</SelectItem>
               </SelectContent>
             </Select>
