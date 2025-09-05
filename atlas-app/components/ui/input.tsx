@@ -81,7 +81,6 @@ function Input({
                   onChange(syntheticEvent);
                 }
               }}
-              fromYear={1900}
               toYear={new Date().getFullYear()}
               captionLayout="dropdown"
               showOutsideDays
@@ -94,10 +93,9 @@ function Input({
                 month: "space-y-4",
                 caption_label: " font-medium text-gray-700",
                 caption_dropdowns: "text-gray-600",
-
+                caption: "pt-6",
                 nav_button:
-                  "h-7 w-7 bg-transparent p-0 text-gray-500 opacity-70 hover:opacity-100 transition-colors",
-
+                  "h-7 w-7 bg-transparent p-0 text-gray-500 opacity-70 hover:opacity-100 transition-colors ",
                 head_cell:
                   "text-gray-500 rounded-md w-9 font-normal text-[0.8rem] uppercase",
                 row: "flex w-full mt-2",

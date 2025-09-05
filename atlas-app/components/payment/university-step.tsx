@@ -16,7 +16,6 @@ import { StepTitleDescription } from "./step-title-description";
 import { InputWithLabel } from "../ui/input-with-label";
 import { PaymentData } from "@/types/payment";
 import universityList from "@/constants/uni.json";
-import debounce from "lodash.debounce";
 import Image from "next/image";
 import { VirtualizedList } from "./virtualized-list";
 
@@ -263,7 +262,7 @@ export function UniversityStep({
                             )}
                           {selectedUniversity}
                         </p>
-                        <button
+                        <span
                           onClick={(e) => {
                             e.stopPropagation();
                             handleClear();
@@ -271,7 +270,7 @@ export function UniversityStep({
                           className="p-1 hover:bg-gray-100 rounded"
                         >
                           <X className="w-4 h-4 text-gray-400" />
-                        </button>
+                        </span>
                       </div>
                     </div>
                   </div>
