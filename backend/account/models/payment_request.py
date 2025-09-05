@@ -1,6 +1,32 @@
+import random
+import string
 import uuid
 from django.db import models
 
+
+
+
+class SchoolPaymentRequestInitializer(models.Model):
+    id = models.UUIDField(
+        primary_key=True,  
+        default=uuid.uuid4,  
+        editable=False 
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    email = models.EmailField()
+    status = models.CharField(
+        choices=(
+            ('pending','pending'),
+            ('completed','completed'),
+        ),
+        max_length=10, 
+        null=True, 
+        blank=True
+    )
+
+
+    def __str__(self):
+        return self.email
 
 
 class SchoolPaymentRequest(models.Model):
@@ -32,11 +58,40 @@ class SchoolPaymentRequest(models.Model):
     student_personal_email = models.EmailField(null=True, blank=True)
     student_phone_number = models.CharField(max_length=20, null=True, blank=True)
     student_program_studied = models.CharField(max_length=100, null=True, blank=True)
+    payment_initializer = models.OneToOneField(SchoolPaymentRequestInitializer, on_delete=models.SET_NULL, null=True, blank=True)
+    processing_status = models.CharField(
+        max_length=20,
+        choices=(
+            ("pending",'pending'),
+            ("initiated",'initiated'),
+            ("processing",'processing'),
+            ("in-transit",'in-transit'),
+            ("delivered",'delivered'),
+            ("confirmed",'confirmed'),
+        ),
+        default='pending'
+    )
+    payment_id = models.CharField(
+        max_length=16,
+        unique=True,
+        null=True,
+        blank=True
+    )
 
 
+    def generate_unique_payment_id(self):
+        while True:
+            new_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+            if not SchoolPaymentRequest.objects.filter(payment_id=new_id).exists():
+                return new_id
 
-
-
+    def save(self, *args, **kwargs):
+        if not self.payment_id:
+            self.payment_id = self.generate_unique_payment_id()
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return f"{self.student_first_name} {self.student_last_name} - {self.payment_id}"
+
+
+

@@ -1,3 +1,4 @@
+from account.models.currency import Currency, ExchangeRate
 from rest_framework import serializers
 
 from account.models.payment_request import SchoolPaymentRequest
@@ -11,7 +12,13 @@ class SchoolPaymentRequestSerializer(serializers.ModelSerializer):
     studentEmail = serializers.EmailField(source='student_email')
     studentPersonalEmail = serializers.EmailField(source='student_personal_email', allow_null=True, required=False)
     studentPhoneNumber = serializers.CharField(source='student_phone_number', allow_null=True, required=False)
-    studentDateOfBirth = serializers.DateField(source='student_date_of_birth', allow_null=True, required=False)
+    # studentDateOfBirth = serializers.DateField(source='student_date_of_birth', allow_null=True, required=False)
+    studentDateOfBirth = serializers.DateField(
+        source='student_date_of_birth',
+        input_formats=['%Y-%m-%d', '%d-%m-%Y'],
+        allow_null=True,
+        required=False
+    )
     studentExpectedYearOfCompletion = serializers.CharField(source='student_expected_year_of_completion', allow_null=True, required=False)
     studentInstitution = serializers.CharField(source='student_institution', allow_null=True, required=False)
     studentProgramStudied = serializers.CharField(source='student_program_studied', allow_null=True, required=False)
@@ -36,7 +43,7 @@ class SchoolPaymentRequestSerializer(serializers.ModelSerializer):
             'payerPhoneNumber', 'payerState', 'payerType', 'payerZipCode', 'paymentType',
             'studentDateOfBirth', 'studentEmail', 'studentExpectedYearOfCompletion', 'studentFirstName',
             'studentInstitution', 'studentLastName', 'studentPersonalEmail', 'studentPhoneNumber',
-            'studentProgramStudied',
+            'studentProgramStudied', 'payment_initializer'
         ]
         read_only_fields = ['id', 'created_at']
 
@@ -67,3 +74,40 @@ class VirtualAccountSerializer(serializers.Serializer):
 class PaymentVerificationSerializer(serializers.Serializer):
     payment_reference = serializers.CharField(required=False)
     transaction_id = serializers.CharField(required=False)
+
+
+
+class PaymentTackingSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=False)
+    payment_reference = serializers.CharField(required=False)
+
+
+
+
+class CurrencyWithRateSerializer(serializers.ModelSerializer):
+    exchange_rate_to_ngn = serializers.SerializerMethodField()
+    rate_last_updated = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Currency
+        fields = [
+            "id", "code", "name", "symbol", "flag", "is_active",
+            "exchange_rate_to_ngn", "rate_last_updated",
+            "created_at", "updated_at"
+        ]
+
+    def get_exchange_rate_to_ngn(self, obj):
+        try:
+            ngn = Currency.objects.get(code="NGN")
+            rate = ExchangeRate.objects.filter(from_currency=obj, to_currency=ngn).latest("last_updated")
+            return float(rate.rate)
+        except ExchangeRate.DoesNotExist:
+            return None
+
+    def get_rate_last_updated(self, obj):
+        try:
+            ngn = Currency.objects.get(code="NGN")
+            rate = ExchangeRate.objects.filter(from_currency=obj, to_currency=ngn).latest("last_updated")
+            return rate.last_updated
+        except ExchangeRate.DoesNotExist:
+            return None

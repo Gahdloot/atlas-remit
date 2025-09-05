@@ -1,5 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
+import { Check } from "lucide-react"
 import Image from "next/image"
+{/* <Check /> */}
 
 export default function ExchangeRatesSection() {
   return (
@@ -18,17 +20,43 @@ export default function ExchangeRatesSection() {
       {/* Dark gradient overlay - from transparent at top to dark at bottom */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent"></div>
 
-      <div className="absolute w-full bottom-6 left-1/2 transform -translate-x-1/2  px-6 z-10 text-sm">
-      <p className="flex items-center gap-2 p-3 w-fit justify-start text-lime-50  bg-primary/20 rounded-3xl">
-        <Image
-          src="/images/home-section/check-swift.png"
-          height={16}
-          width={16}
-          alt="checj"
-          />
-          <p>Payment initiated, estimated time of arrival is within 2-3 business days</p>
-      </p>
+      <div className="absolute w-full bottom-6 left-1/2 transform -translate-x-1/2 space-y-4  px-6 z-10 text-sm">
+        <p className="flex items-center gap-2 p-3 w-fit justify-start text-lime-50  bg-[#19230f] rounded-3xl">
+          <div className="relative w-6 h-6 bg-accent/20 rounded-full flex items-center justify-center mx-auto shadow-lg p-1">
+            <div className="bg-lime-400 rounded-full flex items-center justify-center shadow-lg p-1">
+              <Check className="w-2 h-2 object-contain text-green-700" />
+            </div>
+          </div>
+            <p>Payment initiated</p>
+        </p>
+
+        <p className="flex items-center gap-2 p-3 w-fit justify-start text-lime-50  bg-[#19230f] rounded-3xl">
+          <div className="relative w-6 h-6 bg-accent/20 rounded-full flex items-center justify-center mx-auto shadow-lg p-1">
+            <div className="bg-lime-400 rounded-full flex items-center justify-center shadow-lg p-1">
+              <Check className="w-2 h-2 object-contain text-green-700" />
+            </div>
+          </div>
+            <p>Estimated time of arrival is within 2-3 business days</p>
+        </p>
+
+        <div className="flex items-center gap-2 p-3 w-fit justify-start text-lime-50  bg-[#19230f] rounded-3xl">
+          <div className="relative w-6 h-6 bg-accent/20 rounded-full flex items-center justify-center mx-auto shadow-lg p-1">
+            <div className="bg-lime-400 rounded-full flex items-center justify-center shadow-lg p-1">
+              <Check className="w-2 h-2 object-contain text-green-700" />
+            </div>
+          </div>
+          <p>Funds delivered to institution</p>
+        </div>
+        
       </div>
+      {/* <div className="absolute w-full bottom-6 left-1/2 transform -translate-x-1/2  px-6 z-10 text-sm">
+        
+        
+      </div>
+      <div className="absolute w-full bottom-6 left-1/2 transform -translate-x-1/2  px-6 z-10 text-sm">
+        
+        
+      </div> */}
 
       {/* Exchange Rate Cards - positioned at bottom center */}
       {/* <div className="absolute w-fit -top-12 right-2  z-10 border-2 border-gray-200 rounded-3xl bg-white/95 shadow-2xl">

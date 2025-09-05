@@ -12,14 +12,14 @@ export function LoginModal() {
             <p className="text-foreground">
               Hi there, <span className="text-accent">scholar!</span>
             </p>
-            <p className="text-foreground font-semibold">Welcome to ATLAS!</p>
+            <p className="text-foreground font font-semibold">Welcome to ATLAS!</p>
           </div>
           <p className="text-sm text-muted-foreground">
             Enter your email address to get started with your tuition payment journey.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Input type="email" placeholder="scholar@gmail.com" className="bg-input border-border text-foreground" />
+          <Input type="email" placeholder="scholar@gmail.com" className=" border-border text-foreground" />
           <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90">Continue</Button>
         </CardContent>
       </Card>

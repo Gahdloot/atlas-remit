@@ -20,7 +20,7 @@ export function InputWithLabel({
 
   return (
     <div className={cn("space-y-2", className)}>
-      <label htmlFor={inputId} className="text-sm font-bold text-[#939b98]">
+      <label htmlFor={inputId} className="text-sm font-medium text-[#939b98]">
         {label}
       </label>
       <Input id={inputId} className={inputClassName} {...props} />
