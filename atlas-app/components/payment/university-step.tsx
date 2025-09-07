@@ -16,7 +16,6 @@ import { StepTitleDescription } from "./step-title-description";
 import { InputWithLabel } from "../ui/input-with-label";
 import { PaymentData } from "@/types/payment";
 import universityList from "@/constants/uni.json";
-import debounce from "lodash.debounce";
 import Image from "next/image";
 import { VirtualizedList } from "./virtualized-list";
 
@@ -31,7 +30,7 @@ interface UniversityStepProps {
 const universities = universityList.map((u) => ({
   name: u.name,
   country: u.country,
-  fullDisplay: `(${u.country}) ${u.name}`, 
+  fullDisplay: `(${u.country}) ${u.name}`,
 }));
 
 export function UniversityStep({
@@ -74,20 +73,20 @@ export function UniversityStep({
     }, 50);
   };
 
-const commonSearches = useMemo(() => {
-  const common = ["University", "College", "Institute", "School", "Tech"];
-  const cache = new Map();
+  const commonSearches = useMemo(() => {
+    const common = ["University", "College", "Institute", "School", "Tech"];
+    const cache = new Map();
 
-  common.forEach((term) => {
-    const lowerTerm = term.toLowerCase();
-    const results = universities
-      .filter((u) => u.name.toLowerCase().includes(lowerTerm)) 
-      .slice(0, 20);
-    cache.set(term, results);
-  });
+    common.forEach((term) => {
+      const lowerTerm = term.toLowerCase();
+      const results = universities
+        .filter((u) => u.name.toLowerCase().includes(lowerTerm))
+        .slice(0, 20);
+      cache.set(term, results);
+    });
 
-  return cache;
-}, [universities]);
+    return cache;
+  }, [universities]);
 
   const filteredUniversities = useMemo(() => {
     if (!searchTerm.trim() || searchTerm.length < 2) return [];
@@ -144,19 +143,7 @@ const commonSearches = useMemo(() => {
     return emailRegex.test(email);
   };
 
-  const formatDateInput = (value: string): string => {
-    const digits = value.replace(/\D/g, "").slice(0, 8);
-    let formatted = "";
-    if (digits.length <= 2) {
-      formatted = digits;
-    } else if (digits.length <= 4) {
-      formatted = digits.slice(0, 2) + "-" + digits.slice(2);
-    } else {
-      formatted =
-        digits.slice(0, 2) + "-" + digits.slice(2, 4) + "-" + digits.slice(4);
-    }
-    return formatted;
-  };
+
 
   const isValidDateOfBirth = (dob: string): boolean => {
     const [day, month, year] = dob.split("-").map(Number);
@@ -275,7 +262,7 @@ const commonSearches = useMemo(() => {
                             )}
                           {selectedUniversity}
                         </p>
-                        <button
+                        <span
                           onClick={(e) => {
                             e.stopPropagation();
                             handleClear();
@@ -283,7 +270,7 @@ const commonSearches = useMemo(() => {
                           className="p-1 hover:bg-gray-100 rounded"
                         >
                           <X className="w-4 h-4 text-gray-400" />
-                        </button>
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -334,7 +321,6 @@ const commonSearches = useMemo(() => {
                       items={filteredUniversities}
                       itemHeight={48}
                       visibleHeight={240}
-           
                       renderItem={(university, index) => (
                         <button
                           key={`${university.name}-${index}`}
@@ -354,7 +340,6 @@ const commonSearches = useMemo(() => {
                           </div>
                           <div className="flex-1">
                             <span className="text-sm text-gray-900">
-                     
                               <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2 py-1 rounded mr-2">
                                 {university.country}
                               </span>
@@ -420,7 +405,7 @@ const commonSearches = useMemo(() => {
             </div>
             <div className="space-y-2 w-full">
               <label className="text-sm font-medium text-[#939b98]">
-                Program Studied
+                Program of study
               </label>
               <Select
                 value={paymentData.studentProgramStudied}
@@ -511,9 +496,9 @@ const commonSearches = useMemo(() => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <InputWithLabel
-              label="Student's date of birth (dd-mm-yyyy)"
-              type="text"
-              placeholder=""
+              label="Student's date of birth"
+              type="date"
+              placeholder="dd-mm-yyyy"
               value={paymentData.studentDateOfBirth}
               inputClassName={`bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10 ${
                 paymentData.studentDateOfBirth &&
@@ -522,8 +507,7 @@ const commonSearches = useMemo(() => {
                   : ""
               }`}
               onChange={(e) => {
-                const formattedDate = formatDateInput(e.target.value);
-                updatePaymentData({ studentDateOfBirth: formattedDate });
+                updatePaymentData({ studentDateOfBirth: e.target.value }); 
               }}
             />
             <InputWithLabel

@@ -23,7 +23,7 @@ interface ConfirmPayStepProps {
 }
 
 export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }: ConfirmPayStepProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(true)
   const [virtualAccount, setVirtualAccount] = useState<VirtualAccount | null>(null)
   const [paymentId, setPaymentId] = useState<string>('')
   const [emailUser, setEmailUser] = useState<string>('')

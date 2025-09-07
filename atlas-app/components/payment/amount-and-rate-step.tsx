@@ -1,19 +1,23 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ChevronDown, Building2 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { StepTitleDescription } from "./step-title-description"
-import { PaymentData } from "@/types/payment"
-import { useGetCurrenciesWithRatesQuery } from "@/store/api/schoolPaymentSlice"
+import { useState } from "react";
+import { ChevronDown, Building2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { StepTitleDescription } from "./step-title-description";
+import { PaymentData } from "@/types/payment";
+import { useGetCurrenciesWithRatesQuery } from "@/store/api/schoolPaymentSlice";
+import Image from "next/image";
+import Bank from "@/public/svgs/bank.svg";
+import { Flag } from "@/components/ui/flag-icon"; 
+import SvgWrapper from "../ui/svg-wrapper";
 
 interface PaymentDetailsStepProps {
-  paymentData: PaymentData
-  updatePaymentData: (data: Partial<PaymentData>) => void
-  nextStep: () => void
-  prevStep: () => void
-  currentStep: number
+  paymentData: PaymentData;
+  updatePaymentData: (data: Partial<PaymentData>) => void;
+  nextStep: () => void;
+  prevStep: () => void;
+  currentStep: number;
 }
 
 export function AmountAndRateStep({
@@ -23,46 +27,46 @@ export function AmountAndRateStep({
   prevStep,
   currentStep,
 }: PaymentDetailsStepProps) {
-  const { data, isLoading, isError } = useGetCurrenciesWithRatesQuery({})
+  const { data, isLoading, isError } = useGetCurrenciesWithRatesQuery({});
+  const currencies = data?.data || [];
+  const [selectedCurrency, setSelectedCurrency] = useState("CAD");
+  const [amount, setAmount] = useState("");
+  const [showCurrencyList, setShowCurrencyList] = useState(false);
 
-  const currencies = data?.data || []
-
-  const [selectedCurrency, setSelectedCurrency] = useState("CAD")
-  const [amount, setAmount] = useState("")
-  const [showCurrencyList, setShowCurrencyList] = useState(false)
-
-  const selectedCurrencyData = currencies.find((c) => c.code === selectedCurrency)
-  const selectedRate = selectedCurrencyData?.exchange_rate_to_ngn || 1
+  const selectedCurrencyData = currencies.find(
+    (c) => c.code === selectedCurrency
+  );
+  const selectedRate = selectedCurrencyData?.exchange_rate_to_ngn || 1;
 
   const handleCurrencySelect = (currencyCode: string) => {
-    setSelectedCurrency(currencyCode)
-    setShowCurrencyList(false)
-  }
+    setSelectedCurrency(currencyCode);
+    setShowCurrencyList(false);
+  };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
+    const value = e.target.value;
     if (value === "" || /^\d*\.?\d*$/.test(value)) {
-      setAmount(value)
+      setAmount(value);
     }
-  }
+  };
 
   const convertedAmount =
     amount && !isNaN(Number(amount))
       ? (parseFloat(amount) * selectedRate).toFixed(2)
-      : ""
+      : "";
 
   const isFormValid =
     paymentData.payerFirstName?.trim() &&
     amount.trim() !== "" &&
     !isNaN(Number(amount)) &&
-    Number(amount) > 0
+    Number(amount) > 0;
 
   const handleNext = () => {
-    if (!isFormValid) return
-    updatePaymentData({ amountCAD: amount }) // You can adapt if you want to track actual selectedCurrency
-    updatePaymentData({ amountNGN: convertedAmount })
-    nextStep()
-  }
+    if (!isFormValid) return;
+    updatePaymentData({ amountCAD: amount });
+    updatePaymentData({ amountNGN: convertedAmount });
+    nextStep();
+  };
 
   return (
     <div className="min-h-screen p-4">
@@ -71,7 +75,7 @@ export function AmountAndRateStep({
         titleGradient="rate"
         descriptions={["Enter details about the amount to be paid"]}
       />
-      <div className="text-[#939b98] bg-gray-50 rounded-2xl p-4 min-h-[280px] relative">
+      <div className="text-[#939b98] bg-white rounded-2xl p-4 min-h-[280px] relative">
         {isLoading ? (
           <div className="flex justify-center items-center h-full">
             <svg
@@ -104,14 +108,24 @@ export function AmountAndRateStep({
             {/* Header */}
             <div className="flex items-center justify-between mb-8 pt-4">
               <div className="flex items-center gap-2">
-                <div className="flex">
-                  <span className="text-2xl">🇳🇬</span>
-                  <span className="text-2xl">{selectedCurrencyData?.flag || "💱"}</span>
+                <div className="flex items-center gap-1">
+                  <Flag currencyCode="NGN" alt="Nigeria" size="lg" />
+                  <Flag 
+                    currencyCode={selectedCurrencyData?.code || ""} 
+                    alt={selectedCurrencyData?.name || "Currency"} 
+                    size="lg" 
+                  />
                 </div>
-                <span className="text-xl font-semibold">NGN/{selectedCurrency}</span>
+                <span className="text-xl font-semibold">
+                  NGN/{selectedCurrency}
+                </span>
               </div>
+
               <div className="text-xl font-semibold text-lime-500">
-                ₦{Number(selectedRate).toLocaleString("en-NG", { minimumFractionDigits: 2 })}
+                ₦
+                {Number(selectedRate).toLocaleString("en-NG", {
+                  minimumFractionDigits: 2,
+                })}
               </div>
             </div>
 
@@ -126,7 +140,7 @@ export function AmountAndRateStep({
                       <input
                         type="search"
                         id="paymentAmount"
-                        className="my-custom-search-input block w-full pr-6 py-4 text-gray-900 border-0 focus:border-0 focus:ring-0 rounded-lg text-base"
+                        className="my-custom-search-input outline-none block w-full pr-6 py-4 text-gray-900 border-0 focus:border-0 focus:ring-0 rounded-lg text-base"
                         placeholder="Enter amount"
                         value={amount}
                         onChange={handleAmountChange}
@@ -137,7 +151,11 @@ export function AmountAndRateStep({
                           onClick={() => setShowCurrencyList(!showCurrencyList)}
                           className="flex items-center gap-2 p-1 border-0 rounded-lg cursor-pointer"
                         >
-                          <span className="text-medium">{selectedCurrencyData?.flag}</span>
+                          <Flag 
+                            currencyCode={selectedCurrencyData?.code || ""} 
+                            alt={selectedCurrencyData?.name || "Currency"} 
+                            size="md" 
+                          />
                           <span className="font-sm">{selectedCurrency}</span>
                           <ChevronDown className="w-4 h-4" />
                         </button>
@@ -150,9 +168,13 @@ export function AmountAndRateStep({
                               <button
                                 key={currency.code}
                                 onClick={() => handleCurrencySelect(currency.code)}
-                                className="w-full flex items-center gap-3 p-3 py-1 hover:bg-gray-50 rounded-xl transition-colors text-left cursor-pointer"
+                                className="w-full flex items-center border-b border-gray-100 gap-3 p-4  hover:bg-gray-50  transition-colors text-left cursor-pointer"
                               >
-                                <span className="text-xl">{currency.flag}</span>
+                                <Flag 
+                                  currencyCode={currency.code} 
+                                  alt={currency.name} 
+                                  size="md" 
+                                />
                                 <span className="text-sm font-sm text-gray-900">{currency.name}</span>
                               </button>
                             ))}
@@ -164,7 +186,9 @@ export function AmountAndRateStep({
 
                   {/* Converted amount */}
                   <div className="border-1 border-gray-200 p-3 rounded-2xl">
-                    <h3 className="text-lg font-medium mb-2">Amount you will send</h3>
+                    <h3 className="text-lg font-medium mb-2">
+                      Amount you will send
+                    </h3>
                     <div className="relative">
                       <input
                         type="text"
@@ -181,7 +205,7 @@ export function AmountAndRateStep({
                       />
                       <div className="absolute end-2.5 bottom-2.5 border-0">
                         <button className="flex items-center gap-2 p-1 border-0 rounded-lg">
-                          <span className="text-medium">🇳🇬</span>
+                          <Flag currencyCode="NGN" alt="Nigeria" size="md" />
                           <span className="font-sm">NGN</span>
                         </button>
                       </div>
@@ -199,8 +223,8 @@ export function AmountAndRateStep({
 
               {/* Transfer method */}
               <div className="flex items-center gap-3 text-gray-500">
-                <Building2 className="w-4 h-4" />
-                <span>Bank Transfer in Nigerian Naira</span>
+               <SvgWrapper icon={Bank} size={34} className="mt-2"  />
+                <span>Bank Transfer in Nigerian Naira </span>
               </div>
             </div>
 
@@ -209,7 +233,7 @@ export function AmountAndRateStep({
               <Button
                 onClick={prevStep}
                 variant="ghost"
-                className="flex-1 w-full py-6 md:flex-none bg-white text-base font-medium text-gray-600 hover:text-gray-900 cursor-pointer"
+                className="flex-1 w-full py-6 md:flex-none hover:text-white bg-white text-base font-medium text-gray-600  cursor-pointer"
               >
                 Go back
               </Button>
@@ -230,5 +254,5 @@ export function AmountAndRateStep({
         )}
       </div>
     </div>
-  )
+  );
 }
