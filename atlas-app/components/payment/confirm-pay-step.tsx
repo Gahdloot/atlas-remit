@@ -13,6 +13,7 @@ import {
 } from "@/store/api/schoolPaymentSlice"
 import { toast } from "sonner" 
 import type { VirtualAccount } from "@/types/payment"
+import Image from "next/image"
 
 interface ConfirmPayStepProps {
   paymentData: PaymentData
@@ -24,6 +25,8 @@ interface ConfirmPayStepProps {
 export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }: ConfirmPayStepProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [virtualAccount, setVirtualAccount] = useState<VirtualAccount | null>(null)
+  const [paymentId, setPaymentId] = useState<string>('')
+  const [emailUser, setEmailUser] = useState<string>('')
   const router = useRouter()
 
   const [createPaymentRequest, { isLoading: isCreatingPayment }] = useCreatePaymentRequestMutation()
@@ -41,6 +44,9 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
         payment_request_id: paymentResult.data.id,
         amount: paymentData.amountNGN,
       }
+
+      setPaymentId(paymentResult.data.id)
+      setEmailUser(paymentResult.data.email)
 
       console.log('Generating virtual account...', virtualAccountData)
       const accountResult = await getVirtualAccount(virtualAccountData).unwrap()
@@ -73,7 +79,7 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
   }
 
   const handleComplete = () => {
-    router.push("/payment/confirmed")
+    router.push(`/payment/confirmed?email=${emailUser}`)
   }
 
   return (
@@ -92,16 +98,22 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
               onClick={prevStep}
               variant="ghost"
               disabled={isProcessing}
-              className="flex-1 w-full py-6 md:flex-none bg-white text-base font-bold text-gray-600 hover:text-gray-900 cursor-pointer disabled:opacity-50"
+              className="flex-1 w-full font-medium py-6 md:flex-none bg-white text-base  text-gray-600 hover:text-gray-900 cursor-pointer disabled:opacity-50"
             >
-              <PenLine />
+              <Image 
+              src="/images/home-section/edit-04.png"
+              height={10}
+              width={10}
+              alt="pay"
+              className="w-5 h-5"
+              />
               <span>Edit details</span>
             </Button>
             
             <Button
               onClick={handlePayNow}
               disabled={isProcessing}
-              className="flex-1 md:flex-none px-8 w-full py-6 cursor-pointer text-base font-bold bg-lime-500 hover:bg-lime-600 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 md:flex-none px-8 w-full py-6 cursor-pointer text-base font-medium  bg-lime-500 hover:bg-lime-600 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isProcessing ? (
                 <>
@@ -110,7 +122,14 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
                 </>
               ) : (
                 <>
-                  <PenLine />
+                  {/* <PenLine /> */}
+                  <Image 
+                  src="/images/home-section/invoice-03.png"
+                  height={10}
+                  width={10}
+                  alt="pay"
+                  className="w-5 h-5"
+                  />
                   <span>Pay now</span>
                 </>
               )}
@@ -240,6 +259,7 @@ export function ConfirmPayStep({ paymentData, prevStep, currentStep, nextStep }:
         amountCAD={paymentData.amountCAD}
         nextStep={handleComplete}
         virtualAccount={virtualAccount}
+        payment_reference={paymentId}
         // paymentData={paymentData}
       />
     </div>

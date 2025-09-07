@@ -5,32 +5,13 @@ import Image from "next/image"
 import ExchangeRatesSection from "./exchange-rates-section"
 
 export function HowItWorks() {
-  const steps1 = [
-    {
-      number: "1",
-      title: "Email address",
-      description: "Send link to email address.",
-      icon: User,
-    },
-    {
-      number: "2", 
-      title: "FX rates",
-      description: "Check live FX rates for conversion",
-      icon: Repeat,
-    },
-    {
-      number: "3",
-      title: "Pay tuition",
-      description: "Enter details and pay.",
-      icon: CreditCard,
-    },
-  ]
+
   const steps = [
   {
     number: "1",
     title: "Email address",
     description: "Send link to email address.",
-    image: "/images/home-section/user.png", // ✅ your image path
+    image: "/images/home-section/user.png", 
   },
   {
     number: "2", 
@@ -59,18 +40,18 @@ export function HowItWorks() {
         <div className="w-full md:max-w-4xl  mx-auto px-6 py-16  text-white ">
 
           <div className="flex flex-col items-center justify-center text-center mb-16">
-            <p className="flex items-center gap-3 text-sm text-lime-100 bg-primary/20 px-4 py-2 rounded-full w-fit shadow-lime-50 shadow mb-4">
+            <p className="flex items-center gap-3 text-sm text-lime-100 bg-[#01120b] px-4 py-2 rounded-full w-fit shadow-lime-50 shadow mb-4">
               <GraduationCap className="w-4 h-4" />
               <span>How to use</span>
             </p>
 
-            <h2 className="text-4xl lg:text-5xl font-serif font-bold mb-4 bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
+            <h2 className="text-4xl lg:text-5xl font-work-sans-override font-semibold mb-4 bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
               How ATLAS works <br />
               <span>for tuition payments</span>
             </h2>
 
             <p className="text-gray-400 max-w-xl mx-auto">
-              Send tution payments confidentially with ATLA, you get secure, transparent rates, and fees design to save you money
+              Send tution payments confidentially with ATLAS by Oneremit, you get secure, transparent rates, and fees design to save you money
             </p>
           </div>
 

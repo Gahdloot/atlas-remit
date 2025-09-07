@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Initiated - Atlas by Oneremit</title>
+</head>
+<body style="margin:0; padding:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; background-color:#f8f9fa;">
+    <div style="max-width:600px; margin:0 auto; background:#fff; padding:40px 30px;">
+        <div style="text-align:center; margin-bottom:40px;">
+            <div style="font-size:48px; font-weight:bold; color:#84cc16; margin-bottom:8px;">⛰️atlas</div>
+            <div style="font-size:14px; color:#6b7280; font-weight:500;">By Oneremit</div>
+        </div>
+
+        <h1 style="font-size:24px; font-weight:600; color:#111827; margin:0 0 30px;">Hello {{ user_name }},</h1>
+
+        <p style="font-size:16px; color:#374151; line-height:1.6; margin:0 0 30px;">
+            Your tuition payment has been initiated. Tap on the button below to track your payment.
+        </p>
+
+        <div style=" margin-bottom:40px;">
+            <a href="{{ track_link }}" style="background:#84cc16; color:#fff; padding:14px 24px; border-radius:8px; text-decoration:none; font-weight:bold;">Track payment</a>
+        </div>
+
+        <p style="font-size:16px; color:#374151; margin:0 0 40px;">
+            <strong>Payment ID:</strong> <a href="{{ track_link }}" style="color:#3b82f6; text-decoration:none;">{{ payment_id }}</a>
+        </p>
+
+        <p style="font-size:16px; color:#374151; line-height:1.6; margin:0 0 30px;">
+            If the button doesn’t work copy and paste the linkinto your browser:
+        </p>
+
+        <a href="{{ track_link }}" style="color:#3b82f6; text-decoration:none;">{{ track_link }}</a> <br><br>
+
+
+        <h2 style="font-size:18px; font-weight:600; color:#111827; margin:0 0 16px;">Security</h2>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:40px;">
+            <tr>
+                <td style="width:24px; vertical-align:top; padding-right:8px;">🔒</td>
+                <td style="font-size:16px; color:#374151;">If you didn’t request this, ignore this email.</td>
+            </tr>
+        </table>
+
+        <h2 style="font-size:18px; font-weight:600; color:#111827; margin:0 0 16px;">Need any help?</h2>
+        <p style="font-size:16px; color:#374151; margin:0 0 40px;">Email <a href="mailto:support@oneremit.co" style="color:#3b82f6; text-decoration:none;">support@oneremit.co</a></p>
+
+        <div style="border-top:1px solid #e5e7eb; padding-top:30px; text-align:center;">
+            <p style="font-size:14px; color:#6b7280; margin:0;">This email was sent by Atlas by Oneremit<br>© {{ current_year }} Oneremit. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

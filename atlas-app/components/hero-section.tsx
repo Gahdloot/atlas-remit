@@ -30,8 +30,8 @@ export function HeroSection() {
             
           </div>
 
-          <div className="relative">
-            <h1 className="relative text-5xl lg:text-7xl font-bold leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
+          <div className="relative font-work-sans-override">
+            <h1 className="relative text-5xl lg:text-7xl font-semibold leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
               Send tuition money{" "}
               <span className="">
                 across borders easily
@@ -80,7 +80,7 @@ export function HeroSection() {
                 alt="checj"
                 />
               </div>
-              No credit cards needed
+              No credit/debit cards needed
             </div>
           </div>
         </div>

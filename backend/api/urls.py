@@ -4,7 +4,6 @@ from account import views
 
 
 urlpatterns = [ 
-    path('', views.WelcomeTestEmailView.as_view(), name='welcome-email'), # testing path
 
     path('get-started/', views.WelcomeEmailView.as_view(), name='welcome-email'),
     
@@ -13,10 +12,15 @@ urlpatterns = [
     
     # Payment request creation
     path('payment-requests/', views.SchoolPaymentRequestCreateView.as_view(), name='payment-requests'),
+
+    # track payment
+    path('track-payment/', views.TractPaymentView.as_view(), name='track-payment'),
     
     # One-time virtual account generation
     path('get-one-time-account/', views.OneTimeVirtualAccountView.as_view(), name='one-time-account'),
     
     # Payment verification
     path('verify-payment/', views.PaymentVerificationView.as_view(), name='verify-payment'),
+
+    path('currencies/', views.CurrencyRateListView.as_view(), name='currencies'),
 ]
