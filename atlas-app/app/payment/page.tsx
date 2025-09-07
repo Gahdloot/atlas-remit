@@ -69,7 +69,7 @@ export default function PaymentPage() {
 
       <div className="flex items-center justify-center h-full">
         <div>
-          <h1 className="text-5xl font-semibold font-work-sans-override leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-semibold font-work-sans-override leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
             A few clicks away
             <br />
             from completing

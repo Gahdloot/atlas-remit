@@ -1,41 +1,48 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog"
-import { X, Upload, FileText, Copy, Check } from "lucide-react"
-import { useRouter } from "next/navigation"
-import jsPDF from "jspdf"
-import { 
-  useVerifyPaymentMutation
-} from "@/store/api/schoolPaymentSlice"
-
+import type React from "react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { X, Upload, FileText, Copy, Check } from "lucide-react";
+import { useRouter } from "next/navigation";
+import jsPDF from "jspdf";
+import { useVerifyPaymentMutation } from "@/store/api/schoolPaymentSlice";
+import SvgWrapper from "../ui/svg-wrapper";
+import FileIcon from "@/public/svg/invoice-03.svg";
 interface PaymentModalProps {
-  isOpen: boolean
-  onClose: () => void
-  amountNGN: string
-  amountCAD: string
-  nextStep: () => void
-  virtualAccount : any,
-  payment_reference:string
+  isOpen: boolean;
+  onClose: () => void;
+  amountNGN: string;
+  amountCAD: string;
+  nextStep: () => void;
+  virtualAccount: any;
+  payment_reference: string;
 }
 
-export function PaymentModal({ isOpen, onClose, amountNGN, amountCAD, nextStep, virtualAccount,payment_reference }: PaymentModalProps) {
-  const router = useRouter()
-  const [copiedField, setCopiedField] = useState<string | null>(null)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [verifyPayment, { isLoading, error }] = useVerifyPaymentMutation()
+export function PaymentModal({
+  isOpen,
+  onClose,
+  amountNGN,
+  amountCAD,
+  nextStep,
+  virtualAccount,
+  payment_reference,
+}: PaymentModalProps) {
+  const router = useRouter();
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [verifyPayment, { isLoading, error }] = useVerifyPaymentMutation();
 
   const copyToClipboard = async (text: string, field: string) => {
     try {
-      await navigator.clipboard.writeText(text)
-      setCopiedField(field)
-      setTimeout(() => setCopiedField(null), 2000)
+      await navigator.clipboard.writeText(text);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 2000);
     } catch (err) {
-      console.error("Failed to copy text: ", err)
+      console.error("Failed to copy text: ", err);
     }
-  }
+  };
 
   const downloadAsPDF = () => {
     // Create a simple HTML content for PDF
@@ -48,96 +55,111 @@ export function PaymentModal({ isOpen, onClose, amountNGN, amountCAD, nextStep, 
         <p><strong>Account number:</strong> ${virtualAccount?.account_number}</p>
         <p><strong>Account name:</strong> ${virtualAccount?.account_number}</p>
       </div>
-    `
+    `;
 
-    const blob = new Blob([content], { type: "text/html" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "payment-details.html"
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }
+    const blob = new Blob([content], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "payment-details.html";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   const downloadAsPDFV2 = () => {
-    const doc = new jsPDF()
+    const doc = new jsPDF();
 
-    const leftMargin = 15
-    let y = 20
+    const leftMargin = 15;
+    let y = 20;
 
-    doc.setFont("helvetica", "bold")
-    doc.setFontSize(18)
-    doc.text("Payment Details", leftMargin, y)
-    
-    y += 10
-    doc.setLineWidth(0.5)
-    doc.line(leftMargin, y, 195, y) // underline
-    y += 10
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("Payment Details", leftMargin, y);
 
-    doc.setFontSize(12)
-    doc.setFont("helvetica", "normal")
-    doc.text(`Amount: ${amountNGN} NGN (${amountCAD} CAD)`, leftMargin, y)
-    
-    y += 15
-    doc.setFont("helvetica", "bold")
-    doc.text("Bank Details:", leftMargin, y)
-    
-    y += 10
-    doc.setFont("helvetica", "normal")
-    doc.text(`Bank name: ${virtualAccount?.bank_name || "-"}`, leftMargin, y)
-    y += 10
-    doc.text(`Account number: ${virtualAccount?.account_number || "-"}`, leftMargin, y)
-    y += 10
-    doc.text(`Account name: ${virtualAccount?.account_name || "-"}`, leftMargin, y)
+    y += 10;
+    doc.setLineWidth(0.5);
+    doc.line(leftMargin, y, 195, y); // underline
+    y += 10;
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Amount: ${amountNGN} NGN (${amountCAD} CAD)`, leftMargin, y);
+
+    y += 15;
+    doc.setFont("helvetica", "bold");
+    doc.text("Bank Details:", leftMargin, y);
+
+    y += 10;
+    doc.setFont("helvetica", "normal");
+    doc.text(`Bank name: ${virtualAccount?.bank_name || "-"}`, leftMargin, y);
+    y += 10;
+    doc.text(
+      `Account number: ${virtualAccount?.account_number || "-"}`,
+      leftMargin,
+      y
+    );
+    y += 10;
+    doc.text(
+      `Account name: ${virtualAccount?.account_name || "-"}`,
+      leftMargin,
+      y
+    );
 
     // Optional footer
-    y = 280
-    doc.setFontSize(9)
-    doc.setTextColor(150)
-    doc.text("Generated by YourAppName", leftMargin, y)
+    y = 280;
+    doc.setFontSize(9);
+    doc.setTextColor(150);
+    doc.text("Generated by YourAppName", leftMargin, y);
 
-    doc.save("payment-details.pdf")
-  }
-
+    doc.save("payment-details.pdf");
+  };
 
   const handlePaymentComplete = async () => {
-    setIsProcessing(true)
-    
+    setIsProcessing(true);
+
     try {
-      console.log("Verifying payment...")
+      console.log("Verifying payment...");
       const redirectUrl = `${window.location.origin}/track-payment`;
-      const payload ={
+      const payload = {
         payment_reference,
-        redirect_url:redirectUrl
-      }
-      const isPaymentVerified = await verifyPayment(payload).unwrap()
-      
+        redirect_url: redirectUrl,
+      };
+      const isPaymentVerified = await verifyPayment(payload).unwrap();
+
       if (isPaymentVerified) {
-        console.log("Payment verified successfully!")
-        onClose()
-        nextStep()
+        console.log("Payment verified successfully!");
+        onClose();
+        nextStep();
       } else {
-        console.log("Payment verification failed")
+        console.log("Payment verification failed");
       }
     } catch (error) {
-      console.error("Payment verification error:", error)
+      console.error("Payment verification error:", error);
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const bankDetails = [
     { label: "Bank name", value: virtualAccount?.bank_name, field: "bankName" },
-    { label: "Account number", value: virtualAccount?.account_number, field: "accountNumber" },
-    { label: "Account name", value: virtualAccount?.account_name, field: "accountName" },
-  ]
+    {
+      label: "Account number",
+      value: virtualAccount?.account_number,
+      field: "accountNumber",
+    },
+    {
+      label: "Account name",
+      value: virtualAccount?.account_name,
+      field: "accountName",
+    },
+  ];
 
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="w-full h-full max-w-none sm:max-w-md sm:h-auto sm:rounded-lg mx-0 sm:mx-auto bg-white shadow-xl">
+        <DialogContent className=" w-full h-full sm:h-auto sm:w-full md:min-w-[30rem] lg:min-w-[42.875rem] lg:min-h-[30rem] rounded-none bg-white">
           <DialogHeader className="relative">
             <button
               onClick={onClose}
@@ -149,43 +171,63 @@ export function PaymentModal({ isOpen, onClose, amountNGN, amountCAD, nextStep, 
           </DialogHeader>
 
           <div className="px-6 space-y-6">
-            {/* Amount Display */}
             <div className="text-center space-y-2">
-              <div className="w-16 h-16 bg-lime-100 rounded-full flex items-center justify-center mx-auto">
-                <FileText className="h-8 w-8 text-lime-600" />
+              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-lime-200 rounded-full flex items-center justify-center mx-auto">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-lime-500 rounded-full flex items-center justify-center mx-auto">
+                  <SvgWrapper
+                    icon={FileIcon}
+                    stroke="#000000ff"
+                    fill="none"
+                   size={30}
+                  />
+                </div>
               </div>
+
               <div className="space-y-1">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  {new Intl.NumberFormat('en-NG', { 
-                    style: 'decimal',
+                <h2 className="text-2xl sm:text-4xl font-bold text-gray-900">
+                  {new Intl.NumberFormat("en-NG", {
+                    style: "decimal",
                     minimumFractionDigits: 2,
-                    maximumFractionDigits: 2 
-                  }).format(Number(amountNGN))} NGN
+                    maximumFractionDigits: 2,
+                  }).format(Number(amountNGN))}{" "}
+                  <span className="text-gray-400">NGN</span>
                 </h2>
                 <p className="text-lime-600 font-medium">
-                  {new Intl.NumberFormat('en-CA', { 
-                    style: 'decimal',
+                  {new Intl.NumberFormat("en-CA", {
+                    style: "decimal",
                     minimumFractionDigits: 2,
-                    maximumFractionDigits: 2 
-                  }).format(Number(amountCAD))} CAD
+                    maximumFractionDigits: 2,
+                  }).format(Number(amountCAD))}{" "}
+                  CAD
                 </p>
               </div>
             </div>
 
             <div className="bg-gray-100 p-4 rounded-lg space-y-4">
               {/* Instructions */}
-              <p className="text-gray-600 text-sm">Please pay the amount above into the bank details below</p>
+              <p className="text-gray-600 text-base text-center text-align-center">
+                Please pay the amount above into the bank details below
+              </p>
 
               {/* Bank Details with Copy Functionality */}
-              <div className="space-y-4">
+              <div className="space-y-8">
                 {bankDetails.map((detail) => (
-                  <div key={detail.field} className="flex items-center justify-between">
+                  <div
+                    key={detail.field}
+                    className="flex items-center justify-between"
+                  >
                     <div className="flex-1">
-                      <p className="text-xs text-gray-500 uppercase tracking-wide">{detail.label}</p>
-                      <p className="font-medium text-gray-900">{detail.value}</p>
+                      <p className="text-xs text-gray-500 uppercase tracking-wide">
+                        {detail.label}
+                      </p>
+                      <p className="font-medium text-gray-900">
+                        {detail.value}
+                      </p>
                     </div>
                     <button
-                      onClick={() => copyToClipboard(detail.value, detail.field)}
+                      onClick={() =>
+                        copyToClipboard(detail.value, detail.field)
+                      }
                       className="p-2 hover:bg-gray-200 rounded-md transition-colors cursor-pointer"
                       disabled={isProcessing}
                     >
@@ -204,7 +246,7 @@ export function PaymentModal({ isOpen, onClose, amountNGN, amountCAD, nextStep, 
                 <Button
                   onClick={downloadAsPDFV2}
                   // variant="outline"
-                  className="border-gray-200 text-gray-700 cursor-pointer bg-white"
+                  className="border-gray-200 text-gray-700 hover:bg-lime-200 cursor-pointer bg-white"
                   disabled={isProcessing}
                 >
                   Download as PDF
@@ -219,39 +261,40 @@ export function PaymentModal({ isOpen, onClose, amountNGN, amountCAD, nextStep, 
                 disabled={isProcessing}
                 className={`
                   w-fit py-3 font-medium rounded-lg transition-all duration-200
-                  ${isProcessing 
-                    ? 'bg-lime-400 cursor-not-allowed' 
-                    : 'bg-lime-500 hover:bg-lime-600 cursor-pointer'
+                  ${
+                    isProcessing
+                      ? "bg-lime-400 cursor-not-allowed"
+                      : "bg-lime-500 hover:bg-lime-600 cursor-pointer"
                   }
                   min-w-[140px] h-[48px] flex items-center justify-center text-white
                 `}
               >
                 {isProcessing ? (
                   <div className="flex space-x-1">
-                    <div 
+                    <div
                       className="w-2 h-2 bg-white rounded-full"
                       style={{
-                        animation: 'dotPulse 1.5s infinite ease-in-out',
-                        animationDelay: '0s'
+                        animation: "dotPulse 1.5s infinite ease-in-out",
+                        animationDelay: "0s",
                       }}
                     ></div>
-                    <div 
+                    <div
                       className="w-2 h-2 bg-white rounded-full"
                       style={{
-                        animation: 'dotPulse 1.5s infinite ease-in-out',
-                        animationDelay: '0.2s'
+                        animation: "dotPulse 1.5s infinite ease-in-out",
+                        animationDelay: "0.2s",
                       }}
                     ></div>
-                    <div 
+                    <div
                       className="w-2 h-2 bg-white rounded-full"
                       style={{
-                        animation: 'dotPulse 1.5s infinite ease-in-out',
-                        animationDelay: '0.4s'
+                        animation: "dotPulse 1.5s infinite ease-in-out",
+                        animationDelay: "0.4s",
                       }}
                     ></div>
                   </div>
                 ) : (
-                  'I have paid'
+                  "I have paid"
                 )}
               </Button>
             </div>
@@ -262,7 +305,9 @@ export function PaymentModal({ isOpen, onClose, amountNGN, amountCAD, nextStep, 
       {/* CSS Styles for Animation */}
       <style jsx>{`
         @keyframes dotPulse {
-          0%, 60%, 100% {
+          0%,
+          60%,
+          100% {
             opacity: 0.3;
             transform: scale(0.8);
           }
@@ -273,5 +318,5 @@ export function PaymentModal({ isOpen, onClose, amountNGN, amountCAD, nextStep, 
         }
       `}</style>
     </>
-  )
+  );
 }
