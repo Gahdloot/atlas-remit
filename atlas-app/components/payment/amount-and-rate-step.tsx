@@ -10,6 +10,7 @@ import { useGetCurrenciesWithRatesQuery } from "@/store/api/schoolPaymentSlice";
 import Image from "next/image";
 import Bank from "@/public/svgs/bank.svg";
 import { Flag } from "@/components/ui/flag-icon"; 
+import SvgWrapper from "../ui/svg-wrapper";
 
 interface PaymentDetailsStepProps {
   paymentData: PaymentData;
@@ -222,8 +223,8 @@ export function AmountAndRateStep({
 
               {/* Transfer method */}
               <div className="flex items-center gap-3 text-gray-500">
-                <Image src={Bank} alt="Bank" width={24} height={25} />
-                <span>Bank Transfer in Nigerian Naira</span>
+               <SvgWrapper icon={Bank} size={36} className="mt-2"  />
+                <span>Bank Transfer in Nigerian Naira </span>
               </div>
             </div>
 
