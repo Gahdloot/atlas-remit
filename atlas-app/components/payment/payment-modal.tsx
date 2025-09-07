@@ -159,7 +159,7 @@ export function PaymentModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="h-screen w-full sm:h-auto sm:w-full md:min-w-[40rem] lg:min-w-[42.875rem] lg:min-h-[49rem] rounded-none bg-white">
+        <DialogContent className=" w-full h-full sm:h-auto sm:w-full md:min-w-[30rem] lg:min-w-[42.875rem] lg:min-h-[30rem] rounded-none bg-white">
           <DialogHeader className="relative">
             <button
               onClick={onClose}
