@@ -223,7 +223,7 @@ export function AmountAndRateStep({
 
               {/* Transfer method */}
               <div className="flex items-center gap-3 text-gray-500">
-               <SvgWrapper icon={Bank} size={36} className="mt-2"  />
+               <SvgWrapper icon={Bank} size={34} className="mt-2"  />
                 <span>Bank Transfer in Nigerian Naira </span>
               </div>
             </div>
