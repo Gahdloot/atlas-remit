@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, Suspense } from "react"
-import { UniversityStep } from "@/components/payment/university-step"
+import { UniversityStep } from "@/components/payment/universityStep"
 import { PaymentDetailsStep } from "@/components/payment/payment-details-step"
 import { ConfirmPayStep } from "@/components/payment/confirm-pay-step"
 import { StepIndicator } from "@/components/payment/step-indicator"
@@ -92,7 +92,7 @@ export default function PaymentPage() {
   {/* Right Side - Push with margin */}
   <div className="w-full md:ml-[33.333%] bg-[#f8f8f8] flex flex-col">
     {/* Step Indicator */}
-    <div className="md:p-8 border-b border-gray-100 w-full lg:w-2/3 md:mx-auto">
+  <div className="md:pt-8 md:pb-2 border-b border-gray-100 w-full lg:w-2/3 md:mx-auto">
       <StepIndicator
         currentStep={currentStep}
         steps={steps.map(({ title, icon, IconImage }) => ({
@@ -104,7 +104,7 @@ export default function PaymentPage() {
     </div>
 
     {/* Step Content */}
-    <div className="flex-1 p-8">
+<div className="flex-1 pt-0 px-8 pb-8">
       <div className="w-full lg:w-2/3 lg:mx-auto">
         <Suspense fallback={null}>
           <CurrentStepComponent

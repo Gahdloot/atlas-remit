@@ -12,12 +12,15 @@ import {
 import { FileUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { InputWithLabel } from "../ui/input-with-label";
+import { Input } from "../ui/input";
 import { StepTitleDescription } from "./step-title-description";
 import { SearchableInput } from "../ui/input-with-label-with-search";
 import { ALL_COUNTRIES } from "@/lib/constants/constants";
 import { PaymentData } from "@/types/payment";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import countries from "@/constants/callingcode.json";
+import React from "react";
 
 interface PaymentDetailsStepProps {
   paymentData: PaymentData;
@@ -36,9 +39,9 @@ export function PaymentDetailsStep({
 }: PaymentDetailsStepProps) {
   const searchParams = useSearchParams();
   const initializer = searchParams.get("initializer");
-
+  const [phone, setPhone] = React.useState("");
   const handleNext = () => {
-    nextStep();
+  nextStep();
   };
 
   useEffect(() => {
@@ -54,8 +57,7 @@ export function PaymentDetailsStep({
     paymentData.payerPhoneNumber?.trim() &&
     paymentData.payerCity?.trim() &&
     paymentData.payerState?.trim() &&
-    paymentData.payerType?.trim() &&
-    paymentData.payerZipCode?.trim();
+    paymentData.payerType?.trim()
 
   return (
     <div className="min-h-screen  p-4 ">
@@ -124,7 +126,7 @@ export function PaymentDetailsStep({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
             <InputWithLabel
-              label="State"
+              label="City"
               value={paymentData.payerState}
               inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
               onChange={(e) =>
@@ -132,14 +134,14 @@ export function PaymentDetailsStep({
               }
             />
             <InputWithLabel
-              label="City"
+              label="State/Province/Region"
               value={paymentData.payerCity}
               inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
               onChange={(e) => updatePaymentData({ payerCity: e.target.value })}
             />
           </div>
           <InputWithLabel
-            label="Postal/Zip code"
+            label="Postal/Zip code (optional)"
             placeholder=""
             value={paymentData.payerZipCode}
             inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
@@ -147,16 +149,17 @@ export function PaymentDetailsStep({
               updatePaymentData({ payerZipCode: e.target.value })
             }
           />
-
           <InputWithLabel
-            label="Phone number"
-            placeholder="+234"
+          label="Phone number"
+            placeholder=""
+            type="tel"
             value={paymentData.payerPhoneNumber}
-            inputClassName="bg-gray-50 border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
-            onChange={(e) =>
+           onChange={(e) =>
               updatePaymentData({ payerPhoneNumber: e.target.value })
             }
+
           />
+          
 
           <Button
             onClick={handleNext}
