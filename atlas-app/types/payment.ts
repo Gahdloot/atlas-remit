@@ -1,8 +1,10 @@
 
 export type PaymentData = {
+  countryCode: any;
   university: any
   identifier?: string | null | undefined
   countryFrom: string
+  countryOfInstitution?: string;
   studentInstitution: any
   studentDateOfBirth: string
   studentExpectedYearOfCompletion: string 

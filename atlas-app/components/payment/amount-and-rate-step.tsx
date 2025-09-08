@@ -45,31 +45,44 @@ export function AmountAndRateStep({
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === "" || /^\d*\.?\d*$/.test(value)) {
-      setAmount(value);
-    }
-  };
+   // Remove any non-digit characters
+  const rawValue = e.target.value.replace(/\D/g, "");
 
-  const convertedAmount =
-    amount && !isNaN(Number(amount))
-      ? (parseFloat(amount) * selectedRate).toFixed(2)
-      : "";
+  if (!rawValue) {
+    setAmount("");
+    return;
+  }
+
+  // Format number with commas
+  const formatted = new Intl.NumberFormat("en-CA", {
+    style: "decimal",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(Number(rawValue));
+
+  setAmount(formatted);
+  };
+const numericAmount = amount.replace(/,/g, ""); 
+const convertedAmount =
+  numericAmount && !isNaN(Number(numericAmount))
+    ? (parseFloat(numericAmount) * selectedRate).toFixed(2)
+    : "";
 
   const isFormValid =
     paymentData.payerFirstName?.trim() &&
-    amount.trim() !== "" &&
-    !isNaN(Number(amount)) &&
-    Number(amount) > 0;
+    numericAmount.trim() !== "" &&
+    !isNaN(Number(numericAmount)) &&
+    Number(numericAmount) > 0;
 
   const handleNext = () => {
     if (!isFormValid) return;
-    updatePaymentData({ amountCAD: amount });
+    updatePaymentData({ amountCAD: numericAmount });
     updatePaymentData({ amountNGN: convertedAmount });
     nextStep();
   };
 
   return (
-    <div className="min-h-screen p-4">
+    <div className="min-h-screen p-0 ">
       <StepTitleDescription
         titleNormal="Amount and"
         titleGradient="rate"

@@ -28,8 +28,8 @@ type SVGIconProps = React.SVGProps<SVGSVGElement> & {
 export default function SVGIcon({
   icon: Icon,
   size = 24,
-  stroke = "currentColor",
-  fill = "none",
+  stroke,
+  fill,
   className,
   ...props
 }: SVGIconProps) {
@@ -37,10 +37,11 @@ export default function SVGIcon({
     <Icon
       width={size}
       height={size}
-      stroke={stroke}
-      fill={fill}
+      stroke={stroke ?? undefined}  // only apply if provided
+      fill={fill ?? undefined}      // only apply if provided
       className={className}
       {...props}
     />
   )
 }
+
