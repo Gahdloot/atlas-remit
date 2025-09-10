@@ -16,10 +16,18 @@ interface UniversityStepProps {
   prevStep: () => void;
 }
 
-export function UniversityStep({ paymentData, updatePaymentData, nextStep, prevStep }: UniversityStepProps) {
-  const [selectedUniversity, setSelectedUniversity] = useState(paymentData.studentInstitution || "");
+export function UniversityStep({
+  paymentData,
+  updatePaymentData,
+  nextStep,
+  prevStep,
+}: UniversityStepProps) {
+  const [selectedUniversity, setSelectedUniversity] = useState(
+    paymentData.studentInstitution || ""
+  );
 
-  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isValidEmail = (email: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isValidDateOfBirth = (dob: string) => {
     if (!dob) return false;
     const birthDate = new Date(dob);
@@ -41,7 +49,7 @@ export function UniversityStep({ paymentData, updatePaymentData, nextStep, prevS
     paymentData.studentDateOfBirth?.trim() &&
     isValidDateOfBirth(paymentData.studentDateOfBirth) &&
     paymentData.studentInstitution?.trim();
- (!paymentData.studentEmail || isValidEmail(paymentData.studentEmail));
+  !paymentData.studentEmail || isValidEmail(paymentData.studentEmail);
   const handleNext = () => isFormValid && nextStep();
 
   return (
@@ -49,28 +57,31 @@ export function UniversityStep({ paymentData, updatePaymentData, nextStep, prevS
       <StepTitleDescription
         titleNormal="Institution"
         titleGradient="Information"
-        descriptions={["Please select your university to continue.", "ATLAS supports schools in Canada and the UK for now."]}
+        descriptions={[
+          "Please select your university to continue.",
+          "ATLAS supports schools in Canada and the UK for now.",
+        ]}
       />
 
-<CountrySelect
-  label="Select Country of Institution"
-  value={
-    paymentData.countryOfInstitution
-      ? {
-          name: paymentData.countryOfInstitution,
-          code: paymentData.countryCode || "",
-          emoji: "", 
-          dial_code: "", 
+      <CountrySelect
+        label="Select Country of Institution"
+        value={
+          paymentData.countryOfInstitution
+            ? {
+                name: paymentData.countryOfInstitution,
+                code: paymentData.countryCode || "",
+                emoji: "",
+                dial_code: "",
+              }
+            : null
         }
-      : null
-  }
-  onChange={(country) =>
-    updatePaymentData({
-      countryOfInstitution: country.name,
-    })
-  }
-/>
-
+        onChange={(country) =>
+          updatePaymentData({
+            countryOfInstitution: country.name,
+            countryCode: country.code,
+          })
+        }
+      />
 
       <UniversityDropdown
         countryCode={paymentData.countryCode}
@@ -79,7 +90,10 @@ export function UniversityStep({ paymentData, updatePaymentData, nextStep, prevS
         updatePaymentData={updatePaymentData}
       />
 
-      <ProgramAndPaymentSelects paymentData={paymentData} updatePaymentData={updatePaymentData} />
+      <ProgramAndPaymentSelects
+        paymentData={paymentData}
+        updatePaymentData={updatePaymentData}
+      />
       <StudentFormFields
         paymentData={paymentData}
         updatePaymentData={updatePaymentData}
@@ -87,7 +101,11 @@ export function UniversityStep({ paymentData, updatePaymentData, nextStep, prevS
         isValidDateOfBirth={isValidDateOfBirth}
       />
 
-      <NavigationButtons prevStep={prevStep} handleNext={handleNext} isFormValid={isFormValid} />
+      <NavigationButtons
+        prevStep={prevStep}
+        handleNext={handleNext}
+        isFormValid={isFormValid}
+      />
     </div>
   );
 }

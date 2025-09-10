@@ -20,9 +20,8 @@ interface CountrySelectProps {
 }
 
 export function CountrySelect({ value, onChange, className, label }: CountrySelectProps) {
-  const [selectedCountry, setSelectedCountry] = React.useState<Country | null>(
-    value || countries[0]
-  );
+  // Start with no selection
+  const [selectedCountry, setSelectedCountry] = React.useState<Country | null>(value || null);
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [filteredCountries, setFilteredCountries] = React.useState<Country[]>(countries);
   const dropdownRef = React.useRef<HTMLDivElement | null>(null);
@@ -63,7 +62,9 @@ export function CountrySelect({ value, onChange, className, label }: CountrySele
               className="w-5 h-5 rounded-full object-cover"
             />
           )}
-          <span className="text-gray-500">{selectedCountry?.name}</span>
+          <span className="text-gray-500">
+            {selectedCountry ? selectedCountry.name : "Select Country"}
+          </span>
         </div>
         <svg
           className="w-4 h-4 text-gray-500"
