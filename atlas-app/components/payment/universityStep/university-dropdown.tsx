@@ -154,7 +154,7 @@ export function UniversityDropdown({
                   setInputValue(e.target.value);
                   setSearchTerm(e.target.value.length >= 2 ? e.target.value : "");
                 }}
-                className="pl-10 border-gray-200 border-[2px] rounded-3xl h-12 w-full"
+                className="pl-10 border-gray-200 border-[2px] rounded-3xl text-gray-500 h-12 w-full"
               />
             </div>
           </div>
