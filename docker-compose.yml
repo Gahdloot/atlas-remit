@@ -19,14 +19,9 @@ services:
   frontend:
     build:
       context: ./atlas-app
-      target: dev
     container_name: atlas-frontend
     environment:
       - NEXT_PUBLIC_API_URL=http://159.65.165.21:8000/api/v1
-      - CHOKIDAR_USEPOLLING=true
-    volumes:
-      - ./atlas-app:/app
-      - /app/node_modules
     ports:
       - "3000:3000"
     depends_on:
