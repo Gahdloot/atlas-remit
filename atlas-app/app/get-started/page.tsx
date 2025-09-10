@@ -11,7 +11,9 @@ import {
   useResendEmailMutation,
 } from "@/store/api/schoolPaymentSlice";
 import Link from "next/link";
-
+import Mail from "@/public/svg/mail-01.svg";
+import SVGIcon from "@/components/ui/svg-wrapper";
+import Logo from "@/public/svg/Nexus.svg";
 export default function GetStartedPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -87,23 +89,23 @@ export default function GetStartedPage() {
             <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
               <Card className="bg-transparent w-full max-w-sm sm:max-w-md border-0 mx-auto">
                 <CardHeader className="text-center pb-6 px-4 sm:px-6">
-                  <Link href={"/"} className="mb-8 sm:mb-12">
-                    <Image
-                      src={"/images/logo-new.png"}
-                      width={300}
-                      height={100}
-                      alt="Atlas"
-                      className="mx-auto w-auto h-12 sm:h-16"
-                      priority
-                    />
-                  </Link>
+                  <div className="flex justify-center">
+                    <Link href={"/"} className="mb-2 sm:mb-6">
+                      <Image
+                        src={"/svg/Nexus.svg"}
+                        alt={"nexus"}
+                        width={140}
+                        height={54}
+                      />
+                    </Link>
+                  </div>
+
                   {step == "1" ? (
                     <>
-                      {/* Welcome Text */}
                       <div className="space-y-1 mb-6">
                         <h2 className="text-white text-2xl font-work-sans-override sm:text-3xl font-normal">
                           <span className="text-lime-500">Welcome</span> to
-                          ATLAS!
+                          Nexus!
                         </h2>
 
                         <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
@@ -114,7 +116,13 @@ export default function GetStartedPage() {
                     </>
                   ) : (
                     <>
-                      {/* Welcome Text */}
+                      <div className=" border-t border-gray-900">
+                        <div className="relative w-30 mt-2 h-30 bg-accent/20 rounded-full mb-4 flex items-center justify-center mx-auto mb-6 shadow-lg p-1">
+                          <div className="bg-lime-400 to-green-600 rounded-full flex items-center justify-center mx-auto shadow-lg p-4">
+                            <SVGIcon icon={Mail} size="40" fill="none" />
+                          </div>
+                        </div>
+                      </div>
                       <div className="space-y-1 mb-3">
                         <h1 className="text-white text-2xl sm:text-3xl font-normal leading-tight">
                           <span className="text-lime-200">Email sent!</span>

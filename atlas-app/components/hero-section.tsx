@@ -40,8 +40,7 @@ export function HeroSection() {
           </div>
 
           <p className="text-lg text-gray-300 max-w-lg leading-relaxed">
-            ATLAS helps international students pay tuition fees securely with better exchange rates and lower fees than
-            traditional banks.
+          Nexus by Oneremit helps international students pay tuition fees securely with better exchange rates and lower fees than traditional banks.
           </p>
 
           <div className="space-y-4">
