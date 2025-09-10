@@ -77,7 +77,7 @@ const [selectedCountry, setSelectedCountry] = React.useState<Country | null>(val
       {showDropdown && (
         <div
           ref={dropdownRef}
-          className="absolute z-50 mt-1 w-full max-h-64 bg-white border border-gray-300 rounded-md shadow-lg"
+          className="absolute z-50 mt-1 w-full max-h-74 bg-white border border-gray-300 rounded-md shadow-lg"
         >
           <div className="sticky top-0 bg-white z-10 border-b border-gray-200 p-2">
             <input
@@ -106,7 +106,7 @@ const [selectedCountry, setSelectedCountry] = React.useState<Country | null>(val
               <button
                 key={country.code}
                 type="button"
-                className="flex items-center w-full px-3 py-2 gap-2 hover:bg-gray-100 text-gray-700"
+                className="flex items-center w-full px-3 py-2 gap-2 border-b border-gray-100 hover:bg-gray-100 text-gray-700"
                 onClick={() => handleSelect(country)}
               >
                 <img

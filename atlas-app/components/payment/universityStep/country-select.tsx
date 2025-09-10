@@ -20,9 +20,8 @@ interface CountrySelectProps {
 }
 
 export function CountrySelect({ value, onChange, className, label }: CountrySelectProps) {
-  const [selectedCountry, setSelectedCountry] = React.useState<Country | null>(
-    value || countries[0]
-  );
+  // Start with no selection
+  const [selectedCountry, setSelectedCountry] = React.useState<Country | null>(value || null);
   const [showDropdown, setShowDropdown] = React.useState(false);
   const [filteredCountries, setFilteredCountries] = React.useState<Country[]>(countries);
   const dropdownRef = React.useRef<HTMLDivElement | null>(null);
@@ -63,7 +62,9 @@ export function CountrySelect({ value, onChange, className, label }: CountrySele
               className="w-5 h-5 rounded-full object-cover"
             />
           )}
-          <span className="text-gray-500">{selectedCountry?.name}</span>
+          <span className="text-gray-500">
+            {selectedCountry ? selectedCountry.name : "Select Country"}
+          </span>
         </div>
         <svg
           className="w-4 h-4 text-gray-500"
@@ -78,7 +79,7 @@ export function CountrySelect({ value, onChange, className, label }: CountrySele
       {showDropdown && (
         <div
           ref={dropdownRef}
-          className="absolute z-50 mt-1 w-full max-h-64 bg-white border border-gray-300 rounded-md shadow-lg"
+          className="absolute z-50 mt-1 w-full max-h-74 bg-white border border-gray-300 rounded-md shadow-lg"
         >
           <div className="sticky top-0 bg-white z-10 border-b border-gray-200 p-2">
             <input
@@ -102,11 +103,12 @@ export function CountrySelect({ value, onChange, className, label }: CountrySele
             items={filteredCountries}
             itemHeight={40}
             visibleHeight={240}
+           
             renderItem={(country) => (
               <button
                 key={country.code}
                 type="button"
-                className="flex items-center w-full px-3 py-2 gap-2 hover:bg-gray-100 text-gray-700"
+                className="flex items-center w-full px-3 py-2 gap-2 hover:bg-gray-100 text-gray-700 border-b border-gray-100"
                 onClick={() => handleSelect(country)}
               >
                 <img
