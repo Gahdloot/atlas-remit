@@ -1,47 +1,47 @@
-
 import React from "react"
+
 /**
- *  SVG Styling Guidelines
+ * SVG Styling Guidelines
  *
- * If you need to change the stroke or fill of an SVG dynamically,
- * DO NOT hardcode `stroke` or `fill` values inside the SVG file itself.
+ * - Do not hardcode stroke/fill inside the SVG itself.
+ * - Always use `currentColor` or `none` for flexible overrides.
  *
- * Bad (hardcoded):
- * <path d="..." stroke="#000000" fill="#ffffff" />
- *
- * Good (flexible):
- * <path d="..." stroke="currentColor" fill="none" />
- *
- * This way, stroke/fill can be controlled through React props or Tailwind classes:
- *
- * <SVGIcon icon={Logo} stroke="red" fill="yellow" size={40} />
- * <SVGIcon icon={Logo} className="text-blue-500" size={48} />
+ * Usage:
+ * <SVGIcon icon={Logo} size={40} />
+ * <SVGIcon icon={Logo} width={100} height={50} fill="red" />
+ * <SVGIcon icon={Logo} className="text-blue-500 w-16 h-16" />
  */
 
 type SVGIconProps = React.SVGProps<SVGSVGElement> & {
   icon: React.FC<React.SVGProps<SVGSVGElement>>
   size?: number | string
+  width?: number | string
+  height?: number | string
   stroke?: string
   fill?: string
 }
 
 export default function SVGIcon({
   icon: Icon,
-  size = 24,
+  size,
+  width,
+  height,
   stroke,
   fill,
   className,
   ...props
 }: SVGIconProps) {
+  const finalWidth = width ?? size 
+  const finalHeight = height ?? size 
+
   return (
     <Icon
-      width={size}
-      height={size}
-      stroke={stroke ?? undefined}  // only apply if provided
-      fill={fill ?? undefined}      // only apply if provided
+      width={finalWidth}
+      height={finalHeight}
+      stroke={stroke ?? undefined}
+      fill={fill ?? undefined}
       className={className}
       {...props}
     />
   )
 }
-

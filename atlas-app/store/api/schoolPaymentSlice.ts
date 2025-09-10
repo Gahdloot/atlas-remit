@@ -10,15 +10,14 @@ import type {
   PaymentVerificationRequest,
   PaginationParams,
   PaginatedResponse,
-  ApiResponse
+  ApiResponse,
 } from "@/types/payment";
 
 export const schoolPaymentSlice = createApi({
   reducerPath: "schoolPaymentSlice",
   baseQuery: customFetchBase,
-  tagTypes: ['PaymentRequest', 'VirtualAccount', 'PaymentVerification'],
+  tagTypes: ["PaymentRequest", "VirtualAccount", "PaymentVerification"],
   endpoints: (builder) => ({
-    
     sendWelcomeEmail: builder.mutation<
       ApiResponse<{ email: string; sent_at: string }>,
       { email: string }
@@ -50,23 +49,18 @@ export const schoolPaymentSlice = createApi({
         method: "GET",
         params: params,
       }),
-      providesTags: ['PaymentRequest'],
+      providesTags: ["PaymentRequest"],
     }),
-
-
 
     // ============= PAYMENT REQUEST ENDPOINTS =============
 
-    createPaymentRequest: builder.mutation<
-      ApiResponse<PaymentRequest>,
-      any
-    >({
+    createPaymentRequest: builder.mutation<ApiResponse<PaymentRequest>, any>({
       query: (paymentData) => ({
         url: `payment-requests/`,
         method: "POST",
         body: paymentData,
       }),
-      invalidatesTags: ['PaymentRequest'],
+      invalidatesTags: ["PaymentRequest"],
     }),
 
     getPaymentRequestsList: builder.query<
@@ -78,18 +72,15 @@ export const schoolPaymentSlice = createApi({
         method: "GET",
         params: params,
       }),
-      providesTags: ['PaymentRequest'],
+      providesTags: ["PaymentRequest"],
     }),
 
-    getPaymentRequestById: builder.query<
-      ApiResponse<PaymentRequest>,
-      string
-    >({
+    getPaymentRequestById: builder.query<ApiResponse<PaymentRequest>, string>({
       query: (requestId) => ({
         url: `payment-requests/${requestId}/`,
         method: "GET",
       }),
-      providesTags: (result, error, id) => [{ type: 'PaymentRequest', id }],
+      providesTags: (result, error, id) => [{ type: "PaymentRequest", id }],
     }),
 
     updatePaymentRequest: builder.mutation<
@@ -102,20 +93,17 @@ export const schoolPaymentSlice = createApi({
         body: paymentData,
       }),
       invalidatesTags: (result, error, { id }) => [
-        { type: 'PaymentRequest', id },
-        'PaymentRequest'
+        { type: "PaymentRequest", id },
+        "PaymentRequest",
       ],
     }),
 
-    deletePaymentRequest: builder.mutation<
-      ApiResponse<void>,
-      string
-    >({
+    deletePaymentRequest: builder.mutation<ApiResponse<void>, string>({
       query: (requestId) => ({
         url: `payment-requests/${requestId}/`,
         method: "DELETE",
       }),
-      invalidatesTags: ['PaymentRequest'],
+      invalidatesTags: ["PaymentRequest"],
     }),
 
     // ============= VIRTUAL ACCOUNT ENDPOINTS =============
@@ -129,18 +117,15 @@ export const schoolPaymentSlice = createApi({
         method: "POST",
         body: accountData,
       }),
-      invalidatesTags: ['VirtualAccount'],
+      invalidatesTags: ["VirtualAccount"],
     }),
 
-    getVirtualAccountById: builder.query<
-      ApiResponse<VirtualAccount>,
-      string
-    >({
+    getVirtualAccountById: builder.query<ApiResponse<VirtualAccount>, string>({
       query: (accountId) => ({
         url: `virtual-accounts/${accountId}/`,
         method: "GET",
       }),
-      providesTags: (result, error, id) => [{ type: 'VirtualAccount', id }],
+      providesTags: (result, error, id) => [{ type: "VirtualAccount", id }],
     }),
 
     getVirtualAccountsByPaymentRequest: builder.query<
@@ -152,7 +137,7 @@ export const schoolPaymentSlice = createApi({
         method: "GET",
         params: { payment_request_id: paymentRequestId },
       }),
-      providesTags: ['VirtualAccount'],
+      providesTags: ["VirtualAccount"],
     }),
 
     // ============= PAYMENT VERIFICATION ENDPOINTS =============
@@ -166,9 +151,8 @@ export const schoolPaymentSlice = createApi({
         method: "POST",
         body: verificationData,
       }),
-      invalidatesTags: ['PaymentVerification', 'PaymentRequest'],
+      invalidatesTags: ["PaymentVerification", "PaymentRequest"],
     }),
-
 
     trackPayment: builder.mutation<
       ApiResponse<any>,
@@ -179,7 +163,7 @@ export const schoolPaymentSlice = createApi({
         method: "POST",
         body: verificationData,
       }),
-      invalidatesTags: ['PaymentVerification', 'PaymentRequest'],
+      invalidatesTags: ["PaymentVerification", "PaymentRequest"],
     }),
 
     getPaymentVerificationHistory: builder.query<
@@ -191,7 +175,7 @@ export const schoolPaymentSlice = createApi({
         method: "GET",
         params: params,
       }),
-      providesTags: ['PaymentVerification'],
+      providesTags: ["PaymentVerification"],
     }),
 
     // ============= BULK OPERATIONS =============
@@ -205,12 +189,12 @@ export const schoolPaymentSlice = createApi({
         method: "POST",
         body: { requests: paymentRequests },
       }),
-      invalidatesTags: ['PaymentRequest'],
+      invalidatesTags: ["PaymentRequest"],
     }),
 
     exportPaymentRequests: builder.mutation<
       Blob,
-      { format: 'csv' | 'excel'; filters?: PaginationParams }
+      { format: "csv" | "excel"; filters?: PaginationParams }
     >({
       query: ({ format, filters = {} }) => ({
         url: `payment-requests/export/`,
@@ -248,13 +232,19 @@ export const schoolPaymentSlice = createApi({
 
     uploadDocument: builder.mutation<
       ApiResponse<{ file_url: string; file_id: string }>,
-      { file: File; document_type: 'student_document' | 'payer_id_document' | 'payment_receipt' }
+      {
+        file: File;
+        document_type:
+          | "student_document"
+          | "payer_id_document"
+          | "payment_receipt";
+      }
     >({
       query: ({ file, document_type }) => {
         const formData = new FormData();
-        formData.append('file', file);
-        formData.append('document_type', document_type);
-        
+        formData.append("file", file);
+        formData.append("document_type", document_type);
+
         return {
           url: `documents/upload/`,
           method: "POST",
@@ -265,61 +255,74 @@ export const schoolPaymentSlice = createApi({
         };
       },
     }),
-
-    deleteDocument: builder.mutation<
-      ApiResponse<void>,
-      string
+    uploadFileBase64: builder.mutation<
+      ApiResponse<{ file_url: string; file_id: string }>,
+      { file_base64: string; filename: string }
     >({
+      query: ({ file_base64, filename }) => ({
+        url: `/file-upload/`,
+        method: "POST",
+        body: {
+          file_base64,
+          filename,
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }),
+    }),
+
+    deleteDocument: builder.mutation<ApiResponse<void>, string>({
       query: (documentId) => ({
         url: `documents/${documentId}/`,
         method: "DELETE",
       }),
     }),
 
-
-  getCurrenciesWithRates: builder.query<
-    ApiResponse<any[]>,
-    { active_only?: boolean; base_currency?: string }
-  >({
-    query: (params = { base_currency: 'NGN' }) => ({
-      url: `currencies/`,
-      method: "GET",
-      params: params,
+    getCurrenciesWithRates: builder.query<
+      ApiResponse<any[]>,
+      { active_only?: boolean; base_currency?: string }
+    >({
+      query: (params = { base_currency: "NGN" }) => ({
+        url: `currencies/`,
+        method: "GET",
+        params: params,
+      }),
     }),
-  }),
-  getExchangeRates: builder.query<
-    ApiResponse<any[]>,
-    { from_currency?: string; to_currency?: string }
-  >({
-    query: (params = {}) => ({
-      url: `exchange-rates/`,
-      method: "GET",
-      params: params,
+    getExchangeRates: builder.query<
+      ApiResponse<any[]>,
+      { from_currency?: string; to_currency?: string }
+    >({
+      query: (params = {}) => ({
+        url: `exchange-rates/`,
+        method: "GET",
+        params: params,
+      }),
     }),
-  }),
 
-
-  refreshExchangeRates: builder.mutation<
-    ApiResponse<{ updated_rates: number; last_updated: string }>,
-    void
-  >({
-    query: () => ({
-      url: `exchange-rates/refresh/`,
-      method: "POST",
+    refreshExchangeRates: builder.mutation<
+      ApiResponse<{ updated_rates: number; last_updated: string }>,
+      void
+    >({
+      query: () => ({
+        url: `exchange-rates/refresh/`,
+        method: "POST",
+      }),
     }),
-  }),
 
     // ============= NOTIFICATION ENDPOINTS =============
 
     getNotifications: builder.query<
-      ApiResponse<Array<{
-        id: string;
-        title: string;
-        message: string;
-        type: 'success' | 'error' | 'warning' | 'info';
-        read: boolean;
-        created_at: string;
-      }>>,
+      ApiResponse<
+        Array<{
+          id: string;
+          title: string;
+          message: string;
+          type: "success" | "error" | "warning" | "info";
+          read: boolean;
+          created_at: string;
+        }>
+      >,
       { page?: number; unread_only?: boolean }
     >({
       query: (params = {}) => ({
@@ -329,10 +332,7 @@ export const schoolPaymentSlice = createApi({
       }),
     }),
 
-    markNotificationAsRead: builder.mutation<
-      ApiResponse<void>,
-      string
-    >({
+    markNotificationAsRead: builder.mutation<ApiResponse<void>, string>({
       query: (notificationId) => ({
         url: `notifications/${notificationId}/mark-read/`,
         method: "POST",
@@ -380,7 +380,7 @@ export const {
   useGetPaymentRequestByIdQuery,
   useUpdatePaymentRequestMutation,
   useDeletePaymentRequestMutation,
-
+useUploadFileBase64Mutation,
   // Virtual account hooks
   useGetOneTimeVirtualAccountMutation,
   useGetVirtualAccountByIdQuery,
@@ -408,7 +408,6 @@ export const {
   // Webhook hooks
   useConfigureWebhookMutation,
   useTestWebhookMutation,
-
 
   useGetCurrenciesWithRatesQuery,
   useGetExchangeRatesQuery,

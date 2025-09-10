@@ -8,9 +8,10 @@ import { StepTitleDescription } from "./step-title-description";
 import { PaymentData } from "@/types/payment";
 import { useGetCurrenciesWithRatesQuery } from "@/store/api/schoolPaymentSlice";
 import Image from "next/image";
-import Bank from "@/public/svgs/bank.svg";
-import { Flag } from "@/components/ui/flag-icon"; 
+import Bank from "@/public/svg/bank.svg";
+import { Flag } from "@/components/ui/flag-icon";
 import SvgWrapper from "../ui/svg-wrapper";
+import { InputWithLabel } from "../ui/input-with-label";
 
 interface PaymentDetailsStepProps {
   paymentData: PaymentData;
@@ -45,28 +46,28 @@ export function AmountAndRateStep({
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-   // Remove any non-digit characters
-  const rawValue = e.target.value.replace(/\D/g, "");
+    // Remove any non-digit characters
+    const rawValue = e.target.value.replace(/\D/g, "");
 
-  if (!rawValue) {
-    setAmount("");
-    return;
-  }
+    if (!rawValue) {
+      setAmount("");
+      return;
+    }
 
-  // Format number with commas
-  const formatted = new Intl.NumberFormat("en-CA", {
-    style: "decimal",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(Number(rawValue));
+    // Format number with commas
+    const formatted = new Intl.NumberFormat("en-CA", {
+      style: "decimal",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(Number(rawValue));
 
-  setAmount(formatted);
+    setAmount(formatted);
   };
-const numericAmount = amount.replace(/,/g, ""); 
-const convertedAmount =
-  numericAmount && !isNaN(Number(numericAmount))
-    ? (parseFloat(numericAmount) * selectedRate).toFixed(2)
-    : "";
+  const numericAmount = amount.replace(/,/g, "");
+  const convertedAmount =
+    numericAmount && !isNaN(Number(numericAmount))
+      ? (parseFloat(numericAmount) * selectedRate).toFixed(2)
+      : "";
 
   const isFormValid =
     paymentData.payerFirstName?.trim() &&
@@ -123,14 +124,16 @@ const convertedAmount =
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1">
                   <Flag currencyCode="NGN" alt="Nigeria" size="lg" />
-                  <Flag 
-                    currencyCode={selectedCurrencyData?.code || ""} 
-                    alt={selectedCurrencyData?.name || "Currency"} 
-                    size="lg" 
+                  <Flag
+                    currencyCode={selectedCurrencyData?.code || ""}
+                    alt={selectedCurrencyData?.name || "Currency"}
+                    size="lg"
                   />
                 </div>
-                <span className="text-xl font-semibold">
-                  NGN/{selectedCurrency}
+                <span className="font-medium text-gray-600 text-sm flex items-center gap-2">
+                  NGN
+                  <span className="text-lime-500">&rarr;</span>
+                  {selectedCurrency}
                 </span>
               </div>
 
@@ -164,10 +167,10 @@ const convertedAmount =
                           onClick={() => setShowCurrencyList(!showCurrencyList)}
                           className="flex items-center gap-2 p-1 border-0 rounded-lg cursor-pointer"
                         >
-                          <Flag 
-                            currencyCode={selectedCurrencyData?.code || ""} 
-                            alt={selectedCurrencyData?.name || "Currency"} 
-                            size="md" 
+                          <Flag
+                            currencyCode={selectedCurrencyData?.code || ""}
+                            alt={selectedCurrencyData?.name || "Currency"}
+                            size="md"
                           />
                           <span className="font-sm">{selectedCurrency}</span>
                           <ChevronDown className="w-4 h-4" />
@@ -180,15 +183,19 @@ const convertedAmount =
                             {currencies.map((currency) => (
                               <button
                                 key={currency.code}
-                                onClick={() => handleCurrencySelect(currency.code)}
+                                onClick={() =>
+                                  handleCurrencySelect(currency.code)
+                                }
                                 className="w-full flex items-center border-b border-gray-100 gap-3 p-4  hover:bg-gray-50  transition-colors text-left cursor-pointer"
                               >
-                                <Flag 
-                                  currencyCode={currency.code} 
-                                  alt={currency.name} 
-                                  size="md" 
+                                <Flag
+                                  currencyCode={currency.code}
+                                  alt={currency.name}
+                                  size="md"
                                 />
-                                <span className="text-sm font-sm text-gray-900">{currency.name}</span>
+                                <span className="text-sm font-sm text-gray-900">
+                                  {currency.name}
+                                </span>
                               </button>
                             ))}
                           </div>
@@ -236,35 +243,47 @@ const convertedAmount =
 
               {/* Transfer method */}
               <div className="flex items-center gap-3 text-gray-500">
-               <SvgWrapper icon={Bank} size={34} className="mt-2"  />
+                <SvgWrapper
+                  icon={Bank}
+                  size={34}
+                  fill="none"
+                  className="mt-2"
+                />
                 <span>Bank Transfer in Nigerian Naira </span>
               </div>
             </div>
-
-            {/* Navigation buttons */}
-            <div className="grid grid-cols-2 gap-4 md:gap-12 pt-4 justify-between w-full">
-              <Button
-                onClick={prevStep}
-                variant="ghost"
-                className="flex-1 w-full py-6 md:flex-none hover:text-white bg-white text-base font-medium text-gray-600  cursor-pointer"
-              >
-                Go back
-              </Button>
-              <Button
-                onClick={handleNext}
-                className={cn(
-                  "flex-1 md:flex-none px-8 w-full py-6 cursor-pointer text-base font-medium",
-                  isFormValid
-                    ? "bg-lime-500 hover:bg-lime-600 text-white"
-                    : "bg-gray-300 text-gray-400 cursor-not-allowed"
-                )}
-                disabled={!isFormValid}
-              >
-                Next
-              </Button>
-            </div>
           </>
         )}
+      </div>
+      {/* <div className="mt-6">
+        <InputWithLabel
+          label="Narration"
+          value={paymentData.payerState}
+          inputClassName="bg-white border-gray-200 py-4 lg:py-6 text-sm lg:text-base pr-10"
+          onChange={(e) => updatePaymentData({ payerState: e.target.value })}
+        />
+      </div> */}
+      {/* Navigation buttons */}
+      <div className="grid grid-cols-2 gap-4 md:gap-12 pt-4 justify-between w-full">
+        <Button
+          onClick={prevStep}
+          variant="ghost"
+           className="flex-1 w-full py-6 md:flex-none bg-white text-base font-medium text-gray-600 hover:text-gray-900 cursor-pointer"
+        >
+          Go back
+        </Button>
+        <Button
+          onClick={handleNext}
+          className={cn(
+            "flex-1 md:flex-none px-8 w-full py-6 cursor-pointer text-base font-medium",
+            isFormValid
+              ? "bg-lime-500 hover:bg-lime-600 text-white"
+              : "bg-gray-300 text-gray-400 cursor-not-allowed"
+          )}
+          disabled={!isFormValid}
+        >
+          Next
+        </Button>
       </div>
     </div>
   );

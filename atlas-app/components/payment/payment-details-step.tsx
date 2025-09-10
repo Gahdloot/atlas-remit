@@ -21,6 +21,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import countries from "@/constants/callingcode.json";
 import React from "react";
+import { CountrySelect } from "../ui/country-select";
 
 interface PaymentDetailsStepProps {
   paymentData: PaymentData;
@@ -41,7 +42,7 @@ export function PaymentDetailsStep({
   const initializer = searchParams.get("initializer");
   const [phone, setPhone] = React.useState("");
   const handleNext = () => {
-  nextStep();
+    nextStep();
   };
 
   useEffect(() => {
@@ -57,7 +58,7 @@ export function PaymentDetailsStep({
     paymentData.payerPhoneNumber?.trim() &&
     paymentData.payerCity?.trim() &&
     paymentData.payerState?.trim() &&
-    paymentData.payerType?.trim()
+    paymentData.payerType?.trim();
 
   return (
     <div className="min-h-screen  p-4 ">
@@ -70,13 +71,20 @@ export function PaymentDetailsStep({
           ]}
         />
         <div className="space-y-6">
-          <SearchableInput
-            label="Select country"
-            value={paymentData.countryFrom}
-            options={ALL_COUNTRIES}
-            onSelect={(value) => console.log("Selected:", value)}
-            onChange={(value) => updatePaymentData({ countryFrom: value })}
-          />
+          <div className="space-y-2 w-full">
+            <label className="text-sm font-medium text-[#939b98]">
+              Select Country
+            </label>
+            <CountrySelect
+              value={
+                countries.find((c) => c.name === paymentData.countryFrom) ||
+                null
+              }
+              onChange={(country) =>
+                updatePaymentData({ countryFrom: country.name })
+              }
+            />
+          </div>
 
           <div className="space-y-2 w-full">
             <label className="text-sm font-medium text-[#939b98]">Payer</label>
@@ -150,16 +158,14 @@ export function PaymentDetailsStep({
             }
           />
           <InputWithLabel
-          label="Phone number"
+            label="Phone number"
             placeholder=""
             type="tel"
             value={paymentData.payerPhoneNumber}
-           onChange={(e) =>
+            onChange={(e) =>
               updatePaymentData({ payerPhoneNumber: e.target.value })
             }
-
           />
-          
 
           <Button
             onClick={handleNext}

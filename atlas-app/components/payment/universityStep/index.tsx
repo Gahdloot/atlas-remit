@@ -32,8 +32,6 @@ export function UniversityStep({ paymentData, updatePaymentData, nextStep, prevS
   };
 
   const isFormValid =
-    paymentData.studentEmail?.trim() &&
-    isValidEmail(paymentData.studentEmail) &&
     paymentData.studentFirstName?.trim() &&
     paymentData.studentLastName?.trim() &&
     paymentData.studentPersonalEmail?.trim() &&
@@ -43,7 +41,7 @@ export function UniversityStep({ paymentData, updatePaymentData, nextStep, prevS
     paymentData.studentDateOfBirth?.trim() &&
     isValidDateOfBirth(paymentData.studentDateOfBirth) &&
     paymentData.studentInstitution?.trim();
-
+ (!paymentData.studentEmail || isValidEmail(paymentData.studentEmail));
   const handleNext = () => isFormValid && nextStep();
 
   return (
@@ -54,11 +52,25 @@ export function UniversityStep({ paymentData, updatePaymentData, nextStep, prevS
         descriptions={["Please select your university to continue.", "ATLAS supports schools in Canada and the UK for now."]}
       />
 
-      <CountrySelect
-        selectedCountry={paymentData.countryOfInstitution}
-        countryCode={paymentData.countryCode}
-        setCountry={(name, code) => updatePaymentData({ countryOfInstitution: name, countryCode: code })}
-      />
+<CountrySelect
+  label="Select Country of Institution"
+  value={
+    paymentData.countryOfInstitution
+      ? {
+          name: paymentData.countryOfInstitution,
+          code: paymentData.countryCode || "",
+          emoji: "", 
+          dial_code: "", 
+        }
+      : null
+  }
+  onChange={(country) =>
+    updatePaymentData({
+      countryOfInstitution: country.name,
+    })
+  }
+/>
+
 
       <UniversityDropdown
         countryCode={paymentData.countryCode}

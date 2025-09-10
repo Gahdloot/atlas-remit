@@ -25,6 +25,7 @@ export type PaymentData = {
   amountCAD: string
   studentFirstName: string
   studentLastName: string
+  narration: string
 }
 
 export interface ApiResponse<T = any> {
