@@ -1,11 +1,14 @@
 
 import base64
+import os
+import re
 import time
 import uuid
 import logging
 from django.core.files.base import ContentFile
 from django.utils import timezone
 from account.models.currency import Currency
+from helpers.upload_to_blackblaze import upload_to_spaces
 from rest_framework import generics
 from datetime import timedelta, datetime
 import secrets
@@ -15,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 from account.models.payment_request import SchoolPaymentRequest, SchoolPaymentRequestInitializer
 from account.serializers import CurrencyWithRateSerializer, PaymentTackingSerializer, SchoolPaymentRequestSerializer
-from helpers.response import bad_request_response, success_response
+from helpers.response import bad_request_response, success_response, internal_server_error_response
 from helpers.upload_to_s3 import upload_base64_to_s3
 from helpers.email_helper import EmailHelper
 
@@ -36,6 +39,13 @@ class SchoolPaymentRequestCreateView(generics.GenericAPIView):
         except Exception as e:
             logger.warning(f"Invalid payment initializer: {payment_initializer}. Error: {e}")
             return bad_request_response(message="Invalid request")
+        
+        document_keys = ['admission_letter_documents','supporting_documents','payer_id_documents']
+        for doc_key in document_keys:
+            if not data.get(doc_key):
+                return bad_request_response(
+                    message=f"{doc_key} is required"
+                )
 
         if payment_initializer_object.status == 'completed':
             logger.info(f"Payment initializer {payment_initializer} already completed.")
@@ -351,3 +361,42 @@ class CurrencyRateListView(generics.GenericAPIView):
         serializer = CurrencyWithRateSerializer(queryset, many=True)
         return success_response(data=serializer.data)
     
+
+
+
+
+
+
+class UploadFileView(generics.GenericAPIView):
+    def post(self, request):
+        base64_file = request.data.get("file_base64")
+        raw_filename = request.data.get("filename") or str(uuid.uuid4())
+
+        if not base64_file:
+            return bad_request_response(message= "Missing file_base64")
+
+        try:
+            content_type = None
+            match = re.match(r"data:(.*?);base64,", base64_file)
+            if match:
+                content_type = match.group(1)
+                base64_file = base64_file.split(",")[1]
+
+            file_data = base64.b64decode(base64_file)
+            file_obj = io.BytesIO(file_data)
+
+            name, ext = os.path.splitext(raw_filename)
+            filename = name 
+
+            # Upload
+            file_url = upload_to_spaces(file_obj, filename, content_type=content_type)
+
+            if file_url:
+                return success_response({"url": file_url})
+            else:
+                return bad_request_response(message='Upload failed')
+
+        except Exception as e:
+            print(e)
+            return internal_server_error_response()
+

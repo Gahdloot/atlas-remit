@@ -1,37 +1,56 @@
 import os
+import mimetypes
 import boto3
+from botocore.exceptions import NoCredentialsError, ClientError
 from botocore.exceptions import NoCredentialsError
+import environ
+from backend.settings import BASE_DIR
+
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # DigitalOcean Spaces credentials
-SPACE_NAME = os.environ.get("DO_SPACE_NAME")
-REGION = "your-region"  # Example: "nyc3"
-ACCESS_KEY = os.environ.get("DO_ACCESS_KEY")
-SECRET_KEY = os.environ.get("DO_SECRET_KEY")
+SPACE_NAME = env("DO_SPACE_NAME")
+ACCESS_KEY = env("DO_ACCESS_KEY")
+SECRET_KEY = env("DO_SECRET_KEY")
+REGION = env("DO_REGION", default="sfo3") 
 
-# Initialize DigitalOcean Spaces client
 s3_client = boto3.client(
     "s3",
-    region_name="nyc3",
-    endpoint_url="https://files-processor.nyc3.digitaloceanspaces.com",
+    region_name=REGION,
+    endpoint_url=f"https://{REGION}.digitaloceanspaces.com",
     aws_access_key_id=ACCESS_KEY,
     aws_secret_access_key=SECRET_KEY,
 )
 
 
-def upload_to_spaces(uploaded_file, filename):
-    """Uploads file from request.FILES to DigitalOcean Spaces"""
+def upload_to_spaces(uploaded_file, filename, content_type=None):
+    """
+    Uploads a file-like object to DigitalOcean Spaces.
+    Puts all files inside the 'nexus' folder.
+    """
     try:
-        # file_name = uploaded_file.name  # Get the file name
-        s3_client.upload_fileobj(uploaded_file, SPACE_NAME, filename + ".pdf")
+        region = env("DO_REGION", default="sfo3")
 
-        # Generate the file URL
-        file_url = f"https://{SPACE_NAME}.nyc3.digitaloceanspaces.com/{filename}"
+        extension = mimetypes.guess_extension(content_type) if content_type else None
+        if not extension:
+            extension = ".jpg"
 
+        name, _ = os.path.splitext(filename)
+        full_filename = f"nexus/{name}{extension}"  # <-- prefix with folder
+
+        # Upload file with key 'nexus/filename.ext'
+        s3_client.upload_fileobj(uploaded_file, SPACE_NAME, full_filename)
+
+        file_url = f"https://{SPACE_NAME}.{region}.digitaloceanspaces.com/{full_filename}"
         print(f"File uploaded successfully: {file_url}")
-        return file_url  # Return the URL of the uploaded file
+        return file_url
 
-    except NoCredentialsError:
-        print("Credentials not available")
+    except (NoCredentialsError, ClientError) as e:
+        print(f"Upload failed: {e}")
+        return None
+    except Exception as e:
+        print(f"Unexpected error: {e}")
         return None
 
 
@@ -68,3 +87,5 @@ def delete_file(object_name):
         print(f"File '{object_name}' deleted")
     except NoCredentialsError:
         print("Credentials not available")
+
+

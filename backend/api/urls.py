@@ -23,4 +23,6 @@ urlpatterns = [
     path('verify-payment/', views.PaymentVerificationView.as_view(), name='verify-payment'),
 
     path('currencies/', views.CurrencyRateListView.as_view(), name='currencies'),
+
+    path('file-upload/', views.UploadFileView.as_view(), name='UploadFileView'), 
 ]

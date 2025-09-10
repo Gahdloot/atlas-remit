@@ -43,7 +43,8 @@ class SchoolPaymentRequestSerializer(serializers.ModelSerializer):
             'payerPhoneNumber', 'payerState', 'payerType', 'payerZipCode', 'paymentType',
             'studentDateOfBirth', 'studentEmail', 'studentExpectedYearOfCompletion', 'studentFirstName',
             'studentInstitution', 'studentLastName', 'studentPersonalEmail', 'studentPhoneNumber',
-            'studentProgramStudied', 'payment_initializer'
+            'studentProgramStudied', 'payment_initializer','admission_letter_documents',
+            'supporting_documents','payer_id_documents'
         ]
         read_only_fields = ['id', 'created_at']
 

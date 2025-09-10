@@ -77,6 +77,9 @@ class SchoolPaymentRequest(models.Model):
         null=True,
         blank=True
     )
+    payer_id_documents = models.JSONField(default=list,null=True, blank=True)
+    admission_letter_documents = models.JSONField(default=list,null=True, blank=True)
+    supporting_documents = models.JSONField(default=list,null=True, blank=True)
 
 
     def generate_unique_payment_id(self):
