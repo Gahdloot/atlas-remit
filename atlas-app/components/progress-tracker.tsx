@@ -11,7 +11,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({ status }) => {
     {
       id: 1,
       title: "Payment initiated",
-      description: "You have paid on ATLAS",
+      description: "You have paid on Nexus",
       status: "initiated"
     },
     {

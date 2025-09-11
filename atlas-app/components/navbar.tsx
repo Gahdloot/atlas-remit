@@ -93,7 +93,7 @@ export function Navbar() {
                 Support
                 <ChevronDown className="ml-1 h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-white rounded-lg shadow-lg border border-gray-200 p-2">
+              <DropdownMenuContent className="bg-white rounded-lg shadow-lg text-gray-700 border border-gray-200 p-2">
                 <DropdownMenuItem className="hover:bg-gray-50 rounded p-2 cursor-pointer">
                   Help Center
                 </DropdownMenuItem>

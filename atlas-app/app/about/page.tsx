@@ -27,7 +27,7 @@ export default function AboutPage() {
          className="px-6 py-20 text-center mt-24">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-work-sans-override font-semibold mb-6 leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
-            About ATLAS
+            About Nexus
             <br />
             <span className=" leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">by Oneremit</span>
           </h1>
@@ -45,8 +45,8 @@ export default function AboutPage() {
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-3xl font-work-sans-override font-semibold mb-8 leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">Introduction</h2>
           <p className="text-gray-400 text-lg leading-relaxed max-w-3xl mx-auto">
-            ATLAS is a simple, reliable platform built by Oneremit to make paying international school fees stress-free.
-            Whether you're a student, parent, or education agent, ATLAS ensures your payments are processed quickly,
+            Nexus is a simple, reliable platform built by Oneremit to make paying international school fees stress-free.
+            Whether you're a student, parent, or education agent, Nexus ensures your payments are processed quickly,
             transparently, and securely—so you can focus on education, not paperwork.
           </p>
         </div>

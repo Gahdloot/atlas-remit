@@ -24,7 +24,7 @@ export default function Footer() {
                 />
                 </Link>
               <p className="text-gray-400 text-sm mb-6 mt-2">
-                Fast transfers. Lower fees. Total security. ATLAS by Oneremit makes paying tuition abroad easy.
+                Fast transfers. Lower fees. Total security. Nexus by Oneremit makes paying tuition abroad easy.
               </p>
               {/* <div className="flex items-center space-x-3">
                 <span className="text-gray-400 text-sm">Partnered with:</span>

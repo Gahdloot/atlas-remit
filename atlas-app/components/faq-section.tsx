@@ -64,7 +64,7 @@ export function FAQSection() {
             </h2>
 
             <p className="text-gray-400  mb-8 leading-relaxed">
-              Find quick answers to common questions about making payments, using ATLAS, and resolving issues...
+              Find quick answers to common questions about making payments, using Nexus, and resolving issues...
             </p>
 
             <button className="border-lime-50 border text-lime-100 p-2 px-4  rounded-md text-xs font-medium">

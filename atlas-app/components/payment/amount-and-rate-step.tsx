@@ -45,24 +45,16 @@ export function AmountAndRateStep({
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Remove any non-digit characters
-    const rawValue = e.target.value.replace(/\D/g, "");
+  let raw = e.target.value.replace(/,/g, ""); // remove commas
+  if (!raw) return setAmount("");
+  if (!/^(\d+(\.\d{0,2})?)?$/.test(raw)) return;
+  let [integerPart, decimalPart] = raw.split(".");
+  integerPart = Number(integerPart).toLocaleString("en-CA");
+  const formatted = decimalPart !== undefined ? `${integerPart}.${decimalPart}` : integerPart;
 
-    if (!rawValue) {
-      setAmount("");
-      return;
-    }
+  setAmount(formatted);
+};
 
-    // Format number with commas
-    const formatted = new Intl.NumberFormat("en-CA", {
-      style: "decimal",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(Number(rawValue));
-
-    setAmount(formatted);
-  };
   const numericAmount = amount.replace(/,/g, "");
   const convertedAmount =
     numericAmount && !isNaN(Number(numericAmount))

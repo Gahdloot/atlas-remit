@@ -30,7 +30,7 @@ export default function CTA() {
                 </div>
 
                 <p className="text-gray-300 text-sm mb-8 max-w-2xl leading-relaxed">
-                    Students, parents, sponsors—whoever pays the fees can now do it in minutes with ATLAS and enjoy instant
+                    Students, parents, sponsors—whoever pays the fees can now do it in minutes with Nexus and enjoy instant
                     payments, unbeatable rates, and zero hidden charges.
                 </p>
 

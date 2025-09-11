@@ -30,7 +30,7 @@ export default function ResourcesPage() {
     <section className=" py-20">
         <div className="px-6 lg:px-12 py-12 lg:py-24 min-h-[calc(100vh-200px)] max-w-7xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-work-sans-override font-semibold mb-6 leading-tight bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
-            The ATLAS
+            The Nexus
             <br />
             <span className="">Knowledge Base</span>
           </h1>

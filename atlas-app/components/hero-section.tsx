@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { GraduationCap } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-
+import GetQuote from "@/components/ui/get-quote/quote-button"
 export function HeroSection() {
   const router = useRouter()
   return (
@@ -25,7 +25,7 @@ export function HeroSection() {
           <div className="flex items-center gap-3 text-sm text-lime-50  bg-primary/20 px-4 py-2 rounded-full w-fit shadow-lime-50 ">
             <GraduationCap className="w-4 h-4" />
             <span>
-              ATLAS by Oneremit
+              Nexus by Oneremit
             </span>
             
           </div>
@@ -52,21 +52,6 @@ export function HeroSection() {
                 }} size="lg" className="bg-lime-400 text-black hover:bg-lime-500 font-medium px-8 py-3 text-sm cursor-pointer">
                   Pay tution now
                 </Button>
-                <Button onClick={() => {
-                  console.log("clcick")
-                  router.push("/get-started")
-                  // router.push("/get-started")
-                }} size="lg" className="bg-white text-black  font-medium px-4 py-4 text-sm cursor-pointer hover:bg-white">
-                  <Image 
-                  src={'/images/invoice.png'} 
-                  height={16}
-                  width={16}
-                  alt=""
-                  />
-                  <span>
-                    Get a Quote
-                  </span>
-                </Button>
             </div>
             
 
@@ -84,6 +69,7 @@ export function HeroSection() {
           </div>
         </div>
       </div>
+      <GetQuote />
     </section>
   )
 }

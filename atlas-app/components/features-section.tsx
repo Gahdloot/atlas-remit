@@ -170,7 +170,7 @@ export function FeaturesSection() {
                       <span className="text-black">✓</span>
                     </div>
                     <span className="text-lime-400 text-sm">Payment Initiated</span>
-                    <span className="text-gray-400 text-xs">Paid to ATLAS</span>
+                    <span className="text-gray-400 text-xs">Paid to Nexus</span>
                   </div>
 
                   <div className="flex-1 h-0.5 bg-lime-400 mx-4"></div>

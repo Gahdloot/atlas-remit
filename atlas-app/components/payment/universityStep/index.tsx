@@ -59,7 +59,7 @@ export function UniversityStep({
         titleGradient="Information"
         descriptions={[
           "Please select your university to continue.",
-          "ATLAS supports schools in Canada and the UK for now.",
+          "Nexus supports schools in Canada and the UK for now.",
         ]}
       />
 
