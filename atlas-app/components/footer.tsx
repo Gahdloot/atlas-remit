@@ -15,7 +15,7 @@ export default function Footer() {
             <div className="md:col-span-1">
               <Link href={'/'} className=" mb-2">
                 <Image 
-                    src={'/images/logo-new.png'}
+                    src={"/svg/Nexus.svg"}
                     width={100}
                     height={40}
                     alt="Atlas"
