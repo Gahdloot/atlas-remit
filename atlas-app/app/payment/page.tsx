@@ -105,9 +105,9 @@ export default function PaymentPage() {
                 </span>
               </h1>
               <p className="text-lg text-muted-foreground">
-                Send faster, smarter and safer.{" "}
-                <span className="text-white">ATLAS has</span>
-                <br />
+                Send faster, smarter and safer.{" "}   <br />
+                <span className="text-white">Nexus has</span> {" "}
+              
                 <span className="text-white">got you covered.</span>
               </p>
             </div>

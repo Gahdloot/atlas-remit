@@ -46,12 +46,12 @@ export function HowItWorks() {
             </p>
 
             <h2 className="text-4xl lg:text-5xl font-work-sans-override font-semibold mb-4 bg-gradient-to-r from-lime-100 via-lime-200 to-green-300 bg-clip-text text-transparent">
-              How ATLAS works <br />
+              How Nexus works <br />
               <span>for tuition payments</span>
             </h2>
 
             <p className="text-gray-400 max-w-xl mx-auto">
-              Send tution payments confidentially with ATLAS by Oneremit, you get secure, transparent rates, and fees design to save you money
+              Send tution payments confidentially with Nexus by Oneremit, you get secure, transparent rates, and fees design to save you money
             </p>
           </div>
 

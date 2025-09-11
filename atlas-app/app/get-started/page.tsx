@@ -129,7 +129,7 @@ export default function GetStartedPage() {
                         </h1>
                         <div className="space-y-4 mb-6">
                           <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
-                            An email with your payment information has been sent
+                            An email with has been sent to
                             to <span className="text-lime-400">{email}</span>
                           </p>
                         </div>

@@ -108,7 +108,7 @@ export function WelcomeStep({ paymentData, updatePaymentData, nextStep }: Welcom
               Hi there, <span className="text-lime-400">scholar!</span>
             </h1>
             <h2 className="text-white text-2xl sm:text-3xl font-normal">
-              Welcome to ATLAS!
+              Welcome to Nexus!
             </h2>
           </div>
 

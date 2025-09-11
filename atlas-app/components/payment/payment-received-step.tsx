@@ -22,12 +22,12 @@ export function PaymentReceivedStep({ paymentData, updatePaymentData, nextStep }
     <div className="flex items-center justify-center min-h-[70vh]">
       <Card className=" bg-transparent w-full max-w-md border-0">
         <CardHeader className="text-center pb-4 font-bold text-4xl">
-          <div className="text-accent font-serif font-bold text-5xl mb-4">ATLAS</div>
+          <div className="text-accent font-serif font-bold text-5xl mb-4">Nexus</div>
           <div className="space-y-2 ">
             <p className="text-foreground ">
               Hi there, <span className="text-accent">scholar!</span>
             </p>
-            <p className="text-foreground  ">Welcome to ATLAS!</p>
+            <p className="text-foreground  ">Welcome to nexus!</p>
           </div>
           <p className="text-sm text-muted-foreground mt-4">
             Enter your email address. You'll get an email with a link to start the school fees payment process.

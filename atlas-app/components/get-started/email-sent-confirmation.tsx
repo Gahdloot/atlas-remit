@@ -20,7 +20,7 @@ export default function EmailSentConfirmation({
         <CardHeader className="text-center pb-6 px-4 sm:px-6">
             {/* Logo */}
             <div className="mb-8 sm:mb-12">
-            <div className="text-white text-2xl font-bold">Atlas</div>
+            <div className="text-white text-2xl font-bold">Nexux</div>
             <div className="text-gray-400 text-sm">By Oneremit</div>
             </div>
 

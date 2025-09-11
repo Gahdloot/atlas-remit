@@ -67,9 +67,9 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: "ATLAS - Send tuition money across borders easily",
+  title: "Nexus - Send tuition money across borders easily",
   description:
-    "ATLAS helps international students pay tuition fees securely with better exchange rates and lower fees than traditional banks.",
+    "Nexus helps international students pay tuition fees securely with better exchange rates and lower fees than traditional banks.",
   generator: "v0.app",
 }
 
